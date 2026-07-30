@@ -1,0 +1,46 @@
+# JavaScript
+node_modules/
+.pnpm-store/
+dist/
+coverage/
+.vite/
+*.tsbuildinfo
+
+# Local configuration and secrets
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+*.p12
+*.mobileprovision
+
+# Unity generated state
+[Ll]ibrary/
+[Tt]emp/
+[Oo]bj/
+[Ll]ogs/
+[Uu]ser[Ss]ettings/
+[Mm]emoryCaptures/
+[Rr]ecordings/
+Build/
+Builds/
+
+# IDE and operating system
+.idea/
+.vs/
+.vscode/
+*.csproj
+*.sln
+*.user
+.DS_Store
+Thumbs.db
+
+# Contracts
+packages/contracts/cache/
+packages/contracts/out/
+packages/contracts/broadcast/
+
+# Repository-local artifacts
+artifacts/
+*.log
