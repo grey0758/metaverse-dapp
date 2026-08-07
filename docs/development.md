@@ -10,6 +10,7 @@ pnpm dev
 Default development endpoints:
 
 - game WebSocket: `ws://127.0.0.1:8787`
+- Unity NGO direct connection: `127.0.0.1:7777/UDP`
 - account API: `http://127.0.0.1:8788`
 - Web DApp: `http://127.0.0.1:5173`
 
@@ -23,20 +24,29 @@ actions to it.
 
 ## Unity
 
-Use Unity `6000.3.7f1`. Open `apps/unity-client`, then run:
+Use Unity `6000.3.7f1`. Open `apps/unity-client`, load
+`Assets/MetaverseGame/Scenes/Bootstrap.unity`, and enter Play mode. The
+committed scene starts a local host by default and contains:
 
-1. `Metaverse DApp > Create Development Scene`
-2. open `Assets/MetaverseGame/Scenes/Bootstrap.unity`
-3. enter Play mode while the game server is running
+- NGO `2.13.1` over Unity Transport;
+- a 30 Hz `NetworkManager` and direct-IP bootstrap;
+- a server-spawned network player prefab;
+- ordered, server-integrated movement with `CharacterController` collision;
+- server-authoritative `NetworkTransform` replication;
+- one range, line-of-sight, sequence, and cooldown-validated door action.
 
-The generated scene currently exercises local movement and the prototype
-socket. It is not evidence that NGO, a Dedicated Server build, remote transform
-replication, or Unity-side collision authority works.
+`Metaverse DApp > Create Development Scene` regenerates tracked assets. Review
+and commit its output before building; batch builds deliberately fail if the
+scene is missing instead of mutating a clean checkout.
+
+The TypeScript WebSocket client and prototype remain in the repository as a
+rule reference, but the committed Bootstrap scene does not start them.
 
 Repository-owned batch methods:
 
 - `MetaverseGame.Editor.Build.PerformWindowsDevelopment`
 - `MetaverseGame.Editor.Build.PerformAndroidDevelopment`
+- `MetaverseGame.Editor.Build.PerformLinuxServerDevelopment`
 
 Example after a clean Git commit exists:
 
@@ -54,25 +64,60 @@ setup scripts resolve it from the pinned version. On Windows, use the
 code. Do not add `-quit` to a `-runTests` invocation; the Unity Test Framework
 exits after writing the result file.
 
+The Linux Dedicated Server build requires an identified clean revision:
+
+```bash
+BUILD_COMMIT="$(git rev-parse HEAD)" \
+BUILD_NUMBER="local.1" \
+"$UNITY_EDITOR" -batchmode -nographics -quit \
+  -projectPath apps/unity-client \
+  -executeMethod MetaverseGame.Editor.Build.PerformLinuxServerDevelopment \
+  -buildOutput artifacts/linux-server/FeatherfallServer.x86_64 \
+  -logFile artifacts/linux-server-build.log
+```
+
+The output is a directory, not only the small launcher executable. Preserve
+`FeatherfallServer_Data/`, `MonoBleedingEdge/`, `UnityPlayer.so`, the launcher,
+and its adjacent manifest together. A Linux deployment archive must preserve
+directory traversal and executable permissions.
+
+Dedicated Server builds force server mode. Runtime options are:
+
+```text
+-ip <server-address>        client destination, default 127.0.0.1
+-listen-ip <bind-address>   server bind address, default 127.0.0.1
+-port <udp-port>            default 7777
+-mode host|client|server|manual
+```
+
+`UNITY_SERVER` overrides `-mode` to `server`. Keep the default loopback bind
+for local work; selecting a private or public listener is an operations and
+security decision, not a source-code default.
+
 ### Next Unity milestone
 
-Do this only after Unity activation and the first successful package
-resolution:
+Completed foundation:
 
-1. Commit the generated `Packages/packages-lock.json` with the existing
-   manifest before changing the network dependency graph.
-2. In one reviewable change, add the exact NGO and development-tool package
-   pins recorded in `technology-stack.md` and resolve a new lock file.
-3. Keep input, pure rules, network adaptation, and presentation in separate
-   assemblies. A pure rule test must not require a socket or scene.
-4. Add a dedicated-server bootstrap that accepts an API-issued development
-   ticket or an explicitly local direct connection.
-5. Test one server plus at least four independent clients with Multiplayer
+- package and Linux cross-toolchain locks are committed;
+- direct local connection, server spawn, movement, shared collision, transform
+  replication, and one validated door path are implemented;
+- pure authority rules have EditMode coverage;
+- a Linux Dedicated Server has been built from a clean commit and started on
+  Linux with a loopback UDP listener.
+
+The retained evidence for that build is in
+[the first Linux Dedicated Server build record](builds/2026-08-07-linux-dedicated-server.md).
+
+Remaining acceptance work:
+
+1. Test one server plus at least four independent clients with Multiplayer
    Play Mode or separate player processes.
-6. Implement one complete path: move intent, server collision, replicated
-   transform, context query, server-accepted door/task action.
-7. Record CPU, memory, bandwidth, corrections, latency, packet loss, and
-   disconnect behavior before accepting the stack.
+2. Add correction metrics and evaluate movement under 150 ms RTT, 20 ms
+   jitter, and 2 percent packet loss.
+3. Add reconnect or explicit clean rejection without duplicate players.
+4. Prove owner-scoped private test state.
+5. Record CPU, memory, bandwidth, corrections, latency, packet loss, and
+   disconnect behavior before accepting NGO for the full game loop.
 
 Do not delete the current TypeScript prototype until this path passes and its
 room/role behavior has equivalent C# tests. Do not continue adding spatial

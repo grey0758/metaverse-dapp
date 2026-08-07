@@ -52,11 +52,13 @@ prototype. It proves room state, private role delivery, ordered input, and a
 fixed tick. It does not share Unity collision or map rules, so it must not grow
 into a second production spatial authority.
 
-The next network spike moves live movement and interaction authority to NGO on
-a Unity Dedicated Server. Keep the TypeScript tests as a behavior reference
-until the C# rule and integration tests reach parity, then retain Node only for
-control-plane responsibilities. Do not run both implementations as authorities
-for one match.
+The first NGO foundation now moves spawn, collision-integrated movement, and
+one door interaction to a Unity Dedicated Server. It has a real Linux server
+build and loopback startup proof, but has not passed the four-client impairment,
+reconnect, private-state, or metrics gates. Keep the TypeScript tests as a
+behavior reference until the C# rule and integration tests reach parity, then
+retain Node only for control-plane responsibilities. Do not run both
+implementations as authorities for one match.
 
 ## First vertical slice
 
@@ -72,9 +74,11 @@ for one match.
    the match.
 8. Owner-controlled ERC-1155 item minting skeleton with no gameplay powers.
 
-The current framework has completed items 1 and the prototype forms of 3 and
-4, but the target Unity networking path has not yet been compiled or proven.
-The vertical slice does not claim production persistence, voice, matchmaking,
+The current framework has completed item 1, a local Dedicated Server form of
+item 2, the spawn/movement foundation of item 4, and one door form of item 5.
+Room/role authority is still only proven in the TypeScript reference, and the
+Unity path has not passed the complete multiplayer acceptance gate. The
+vertical slice does not claim production persistence, voice, matchmaking,
 moderation storage, ERC-1271/6492 verification, store billing, chain
 deployment, or signed mobile artifacts.
 

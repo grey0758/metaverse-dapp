@@ -11,13 +11,15 @@ Current repository state:
 - validated shared wire protocol;
 - authoritative in-memory lobby, private roles, movement intents, and snapshots;
 - guest session API and explicitly disabled-by-default wallet verification;
-- Unity development-scene generator, socket client, movement prototype,
-  EditMode test, and Windows/Android batch build methods;
+- Unity development-scene generator, socket reference client, committed NGO
+  Bootstrap scene, EditMode tests, and Windows/Android/Linux Dedicated Server
+  batch build methods;
 - optional React DApp and undeployed ERC-1155 owner-mint skeleton.
 
-Exit gates still open: Unity package resolution and C# tests, immutable first
-commit, canonical remote, application identities, signing references, and a
-selected chain/domain if wallet auth is enabled.
+Unity package resolution, C# compilation/tests, immutable commits, and the
+canonical remote are complete. Application identities and signing references
+remain player-release gates; a chain/domain remains optional and is needed
+only if wallet authentication is enabled.
 
 ## Slice 0.5: authoritative network foundation
 
@@ -38,6 +40,18 @@ This is the next implementation slice:
   technology decision;
 - keep the TypeScript server as a rule reference until C# parity tests pass,
   then remove its movement authority.
+
+Current progress:
+
+- NGO `2.13.1`, Multiplayer Tools `2.2.9`, Multiplayer PlayMode `2.0.2`,
+  Unity Transport `2.6.0`, and the Windows-to-Linux toolchain are locked;
+- the direct-IP bootstrap, server-owned spawn and movement, shared arena
+  collision, remote transform replication, and one validated door interaction
+  are implemented in the committed scene;
+- five EditMode tests pass and a clean Linux Dedicated Server build starts and
+  binds to loopback UDP on Linux;
+- four-client impairment testing, correction metrics, reconnect behavior,
+  owner-private state, and C# room/role parity remain open.
 
 Exit gate: the dedicated-server spike passes every acceptance check in
 `technology-stack.md`. If it does not, benchmark Photon Fusion 2 with the same
