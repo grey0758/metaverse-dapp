@@ -2,7 +2,8 @@
   "name": "MetaverseGame.Editor",
   "rootNamespace": "MetaverseGame.Editor",
   "references": [
-    "MetaverseGame.Runtime"
+    "MetaverseGame.Runtime",
+    "Unity.Netcode.Runtime"
   ],
   "includePlatforms": [
     "Editor"

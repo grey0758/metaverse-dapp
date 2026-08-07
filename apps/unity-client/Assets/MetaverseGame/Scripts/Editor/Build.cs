@@ -15,7 +15,12 @@ namespace MetaverseGame.Editor
         public static void PerformWindowsDevelopment()
         {
             string output = RequireBuildOutput("Featherfall/Featherfall.exe");
-            BuildPlayer(BuildTarget.StandaloneWindows64, output);
+            BuildPlayer(
+                BuildTarget.StandaloneWindows64,
+                StandaloneBuildSubtarget.Player,
+                NamedBuildTarget.Standalone,
+                "WindowsDevelopment",
+                output);
         }
 
         public static void PerformAndroidDevelopment()
@@ -25,10 +30,35 @@ namespace MetaverseGame.Editor
             PlayerSettings.SetScriptingBackend(
                 NamedBuildTarget.Android,
                 ScriptingImplementation.IL2CPP);
-            BuildPlayer(BuildTarget.Android, output);
+            BuildPlayer(
+                BuildTarget.Android,
+                StandaloneBuildSubtarget.Player,
+                NamedBuildTarget.Android,
+                "AndroidDevelopment",
+                output);
         }
 
-        private static void BuildPlayer(BuildTarget target, string output)
+        public static void PerformLinuxServerDevelopment()
+        {
+            string output = RequireBuildOutput(
+                "FeatherfallServer/FeatherfallServer.x86_64");
+            PlayerSettings.SetScriptingBackend(
+                NamedBuildTarget.Server,
+                ScriptingImplementation.Mono2x);
+            BuildPlayer(
+                BuildTarget.StandaloneLinux64,
+                StandaloneBuildSubtarget.Server,
+                NamedBuildTarget.Server,
+                "LinuxDedicatedServerDevelopment",
+                output);
+        }
+
+        private static void BuildPlayer(
+            BuildTarget target,
+            StandaloneBuildSubtarget subtarget,
+            NamedBuildTarget namedBuildTarget,
+            string artifactTarget,
+            string output)
         {
             string commit = Environment.GetEnvironmentVariable("BUILD_COMMIT");
             string buildNumber = Environment.GetEnvironmentVariable("BUILD_NUMBER");
@@ -39,7 +69,8 @@ namespace MetaverseGame.Editor
             }
             if (!File.Exists(BootstrapScene))
             {
-                ProjectBootstrap.CreateDevelopmentScene();
+                throw new InvalidOperationException(
+                    $"{BootstrapScene} is missing. Generate and commit the development scene before building.");
             }
 
             string outputDirectory = Path.GetDirectoryName(output);
@@ -53,6 +84,7 @@ namespace MetaverseGame.Editor
                 scenes = new[] { BootstrapScene },
                 locationPathName = output,
                 target = target,
+                subtarget = (int)subtarget,
                 options = BuildOptions.Development,
             });
             if (report.summary.result != BuildResult.Succeeded)
@@ -61,7 +93,15 @@ namespace MetaverseGame.Editor
                     $"Unity build failed: {report.summary.result}");
             }
 
-            WriteManifest(output, target, commit, buildNumber, report);
+            WriteManifest(
+                output,
+                target,
+                subtarget,
+                namedBuildTarget,
+                artifactTarget,
+                commit,
+                buildNumber,
+                report);
         }
 
         private static string RequireBuildOutput(string fallback)
@@ -80,6 +120,9 @@ namespace MetaverseGame.Editor
         private static void WriteManifest(
             string output,
             BuildTarget target,
+            StandaloneBuildSubtarget subtarget,
+            NamedBuildTarget namedBuildTarget,
+            string artifactTarget,
             string commit,
             string buildNumber,
             BuildReport report)
@@ -88,10 +131,10 @@ namespace MetaverseGame.Editor
             {
                 commit = commit,
                 unityVersion = Application.unityVersion,
-                target = target.ToString(),
-                scriptingBackend = PlayerSettings.GetScriptingBackend(
-                    NamedBuildTarget.FromBuildTargetGroup(
-                        BuildPipeline.GetBuildTargetGroup(target))).ToString(),
+                target = artifactTarget,
+                unityBuildTarget = target.ToString(),
+                subtarget = subtarget.ToString(),
+                scriptingBackend = PlayerSettings.GetScriptingBackend(namedBuildTarget).ToString(),
                 buildNumber = buildNumber,
                 timestampUtc = DateTime.UtcNow.ToString("O"),
                 output = output,
@@ -118,6 +161,8 @@ namespace MetaverseGame.Editor
             public string commit;
             public string unityVersion;
             public string target;
+            public string unityBuildTarget;
+            public string subtarget;
             public string scriptingBackend;
             public string buildNumber;
             public string timestampUtc;

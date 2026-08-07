@@ -1,7 +1,9 @@
 {
   "name": "MetaverseGame.Runtime",
   "rootNamespace": "MetaverseGame",
-  "references": [],
+  "references": [
+    "Unity.Netcode.Runtime"
+  ],
   "includePlatforms": [],
   "excludePlatforms": [],
   "allowUnsafeCode": false,

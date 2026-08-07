@@ -2,7 +2,9 @@ using System.IO;
 using MetaverseGame.Bootstrap;
 using MetaverseGame.Config;
 using MetaverseGame.Gameplay;
-using MetaverseGame.Networking;
+using Unity.Netcode;
+using Unity.Netcode.Components;
+using Unity.Netcode.Transports.UTP;
 using UnityEditor;
 using UnityEditor.SceneManagement;
 using UnityEngine;
@@ -16,12 +18,15 @@ namespace MetaverseGame.Editor
         private const string ScenePath = SceneDirectory + "/Bootstrap.unity";
         private const string ResourceDirectory = "Assets/MetaverseGame/Resources";
         private const string EnvironmentPath = ResourceDirectory + "/GameEnvironment.asset";
+        private const string PrefabDirectory = "Assets/MetaverseGame/Prefabs";
+        private const string PlayerPrefabPath = PrefabDirectory + "/NetworkPlayer.prefab";
 
         [MenuItem("Metaverse DApp/Create Development Scene")]
         public static void CreateDevelopmentScene()
         {
             EnsureDirectory(SceneDirectory);
             EnsureDirectory(ResourceDirectory);
+            EnsureDirectory(PrefabDirectory);
 
             GameEnvironment environment = AssetDatabase.LoadAssetAtPath<GameEnvironment>(
                 EnvironmentPath);
@@ -31,6 +36,8 @@ namespace MetaverseGame.Editor
                 AssetDatabase.CreateAsset(environment, EnvironmentPath);
             }
 
+            GameObject playerPrefab = CreateNetworkPlayerPrefab();
+
             Scene scene = EditorSceneManager.NewScene(
                 NewSceneSetup.EmptyScene,
                 NewSceneMode.Single);
@@ -38,10 +45,11 @@ namespace MetaverseGame.Editor
             GameObject camera = new("Main Camera");
             camera.tag = "MainCamera";
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 8f, -9f),
-                Quaternion.Euler(32f, 0f, 0f));
+                new Vector3(0f, 11f, -10f),
+                Quaternion.Euler(38f, 0f, 0f));
             camera.AddComponent<Camera>();
             camera.AddComponent<AudioListener>();
+            camera.AddComponent<FollowLocalPlayer>();
 
             GameObject light = new("Sun");
             Light sun = light.AddComponent<Light>();
@@ -53,25 +61,88 @@ namespace MetaverseGame.Editor
             ground.name = "Low Poly Arena";
             ground.transform.localScale = new Vector3(2.4f, 1f, 2.4f);
 
-            GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
-            player.name = "Local Player";
-            player.transform.position = new Vector3(0f, 1f, 0f);
-            Object.DestroyImmediate(player.GetComponent<CapsuleCollider>());
-            player.AddComponent<CharacterController>();
-            PlayerMotor motor = player.AddComponent<PlayerMotor>();
+            CreateBlock("North Wall", new Vector3(0f, 1.5f, 12f), new Vector3(24f, 3f, 0.5f));
+            CreateBlock("South Wall", new Vector3(0f, 1.5f, -12f), new Vector3(24f, 3f, 0.5f));
+            CreateBlock("East Wall", new Vector3(12f, 1.5f, 0f), new Vector3(0.5f, 3f, 24f));
+            CreateBlock("West Wall", new Vector3(-12f, 1.5f, 0f), new Vector3(0.5f, 3f, 24f));
+            CreateBlock("Divider Left", new Vector3(-6.5f, 1.5f, 2f), new Vector3(11f, 3f, 0.5f));
+            CreateBlock("Divider Right", new Vector3(6.5f, 1.5f, 2f), new Vector3(11f, 3f, 0.5f));
+
+            GameObject door = CreateBlock(
+                "Network Door",
+                new Vector3(0f, 1.5f, 2f),
+                new Vector3(2f, 3f, 0.35f));
+            door.AddComponent<NetworkObject>();
+            door.AddComponent<NetworkDoor>();
 
             GameObject systems = new("Game Systems");
-            systems.AddComponent<GameSocketClient>();
-            GameBootstrap bootstrap = systems.AddComponent<GameBootstrap>();
-            SerializedObject serialized = new(bootstrap);
-            serialized.FindProperty("environment").objectReferenceValue = environment;
-            serialized.FindProperty("localPlayer").objectReferenceValue = motor;
-            serialized.ApplyModifiedPropertiesWithoutUndo();
+            NetworkManager networkManager = systems.AddComponent<NetworkManager>();
+            UnityTransport transport = systems.AddComponent<UnityTransport>();
+            systems.AddComponent<DirectNetworkBootstrap>();
+            networkManager.NetworkConfig.NetworkTransport = transport;
+            networkManager.NetworkConfig.PlayerPrefab = playerPrefab;
+            networkManager.NetworkConfig.TickRate = 30;
+            networkManager.NetworkConfig.EnableSceneManagement = true;
+            networkManager.NetworkConfig.ForceSamePrefabs = true;
 
             EditorSceneManager.SaveScene(scene, ScenePath);
             EditorBuildSettings.scenes = new[] { new EditorBuildSettingsScene(ScenePath, true) };
             AssetDatabase.SaveAssets();
             Debug.Log($"Development scene created at {ScenePath}");
+        }
+
+        private static GameObject CreateNetworkPlayerPrefab()
+        {
+            GameObject existing = AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+            if (existing == null)
+            {
+                GameObject player = GameObject.CreatePrimitive(PrimitiveType.Capsule);
+                player.name = "Network Player";
+                ConfigureNetworkPlayer(player);
+                GameObject prefab = PrefabUtility.SaveAsPrefabAsset(player, PlayerPrefabPath);
+                Object.DestroyImmediate(player);
+                return prefab;
+            }
+
+            GameObject contents = PrefabUtility.LoadPrefabContents(PlayerPrefabPath);
+            ConfigureNetworkPlayer(contents);
+            PrefabUtility.SaveAsPrefabAsset(contents, PlayerPrefabPath);
+            PrefabUtility.UnloadPrefabContents(contents);
+            return AssetDatabase.LoadAssetAtPath<GameObject>(PlayerPrefabPath);
+        }
+
+        private static void ConfigureNetworkPlayer(GameObject player)
+        {
+            player.name = "Network Player";
+            player.transform.localPosition = Vector3.zero;
+            player.transform.localRotation = Quaternion.identity;
+            player.transform.localScale = Vector3.one;
+
+            CapsuleCollider capsuleCollider = player.GetComponent<CapsuleCollider>();
+            if (capsuleCollider != null)
+            {
+                Object.DestroyImmediate(capsuleCollider, true);
+            }
+
+            GetOrAddComponent<CharacterController>(player);
+            GetOrAddComponent<NetworkObject>(player);
+            GetOrAddComponent<NetworkTransform>(player);
+            GetOrAddComponent<NetworkPlayerController>(player);
+        }
+
+        private static GameObject CreateBlock(string name, Vector3 position, Vector3 scale)
+        {
+            GameObject block = GameObject.CreatePrimitive(PrimitiveType.Cube);
+            block.name = name;
+            block.transform.position = position;
+            block.transform.localScale = scale;
+            return block;
+        }
+
+        private static T GetOrAddComponent<T>(GameObject gameObject) where T : Component
+        {
+            T component = gameObject.GetComponent<T>();
+            return component != null ? component : gameObject.AddComponent<T>();
         }
 
         private static void EnsureDirectory(string assetPath)
