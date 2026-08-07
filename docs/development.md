@@ -41,15 +41,18 @@ Repository-owned batch methods:
 Example after a clean Git commit exists:
 
 ```bash
-UNITY_EDITOR -batchmode -quit \
+UNITY_EDITOR -runTests -batchmode -nographics \
   -projectPath apps/unity-client \
-  -runTests -testPlatform editmode \
+  -testPlatform editmode \
   -testResults artifacts/unity-editmode.xml \
   -logFile artifacts/unity-editmode.log
 ```
 
 Do not replace `UNITY_EDITOR` with a guessed path in shared automation. Machine
-setup scripts resolve it from the pinned version.
+setup scripts resolve it from the pinned version. On Windows, use the
+`Unity.com` console entry point so the caller receives the real process exit
+code. Do not add `-quit` to a `-runTests` invocation; the Unity Test Framework
+exits after writing the result file.
 
 ### Next Unity milestone
 
