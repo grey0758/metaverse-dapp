@@ -4,6 +4,9 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/MetaverseGame/Scenes/Bootstrap.unity
+    guid: a53643eba623f354294c91729afc247e
   m_configObjects: {}
   m_UseUCBPForAssetBundles: 0
