@@ -118,13 +118,14 @@ namespace MetaverseGame.Bootstrap
                 return;
             }
 
+            string rejectionReason = string.Empty;
             if (sessionRegistry == null ||
                 !sessionRegistry.TryApproveConnection(
                     request.ClientNetworkId,
                     sessionId,
                     resolvedDisplayName,
                     out SessionRecord session,
-                    out string rejectionReason))
+                    out rejectionReason))
             {
                 response.Approved = false;
                 response.Reason = string.IsNullOrWhiteSpace(rejectionReason)
