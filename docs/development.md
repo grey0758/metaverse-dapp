@@ -30,6 +30,8 @@ committed scene starts a local host by default and contains:
 
 - NGO `2.13.1` over Unity Transport;
 - a 30 Hz `NetworkManager` and direct-IP bootstrap;
+- connection approval with persistent session tickets and owner-only private
+  role state;
 - a server-spawned network player prefab;
 - ordered, server-integrated movement with `CharacterController` collision;
 - server-authoritative `NetworkTransform` replication;

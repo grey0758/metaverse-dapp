@@ -1,3 +1,4 @@
+using Unity.Collections;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -22,6 +23,11 @@ namespace MetaverseGame.Gameplay
         [SerializeField, Min(0.1f)] private float interactionDistance = 2.4f;
         [SerializeField, Min(0.05f)] private float inputTimeout = 0.25f;
 
+        private readonly NetworkVariable<FixedString32Bytes> privateRole = new(
+            default,
+            NetworkVariableReadPermission.Owner,
+            NetworkVariableWritePermission.Server);
+
         private CharacterController controller;
         private Vector2 serverInput;
         private uint localMoveSequence;
@@ -41,10 +47,27 @@ namespace MetaverseGame.Gameplay
             controller.enabled = false;
             if (IsServer)
             {
-                transform.position = SpawnPositions[
-                    (int)(OwnerClientId % (ulong)SpawnPositions.Length)];
+                if (MatchSessionRegistry.Instance != null &&
+                    MatchSessionRegistry.Instance.TryGetSession(
+                        OwnerClientId,
+                        out SessionRecord session))
+                {
+                    transform.position = ResolveSpawnPosition(session.SpawnIndex);
+                    privateRole.Value = new FixedString32Bytes(session.Role);
+                }
+                else
+                {
+                    transform.position = ResolveSpawnPosition(
+                        (int)(OwnerClientId % (ulong)SpawnPositions.Length));
+                    privateRole.Value = new FixedString32Bytes(
+                        OwnerClientId == 1 ? "duck" : "goose");
+                }
             }
             controller.enabled = IsServer;
+            if (IsOwner && privateRole.Value.Length > 0)
+            {
+                Debug.Log($"Private role assigned: {privateRole.Value}");
+            }
         }
 
         private void Update()
@@ -188,6 +211,12 @@ namespace MetaverseGame.Gameplay
                 return false;
             }
             return true;
+        }
+
+        public static Vector3 ResolveSpawnPosition(int spawnIndex)
+        {
+            return SpawnPositions[
+                Mathf.Abs(spawnIndex) % SpawnPositions.Length];
         }
     }
 }

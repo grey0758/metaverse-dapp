@@ -48,10 +48,13 @@ Current progress:
 - the direct-IP bootstrap, server-owned spawn and movement, shared arena
   collision, remote transform replication, and one validated door interaction
   are implemented in the committed scene;
+- session-ticket connection approval, reconnect-preserved role/spawn state,
+  duplicate live-ticket rejection, and owner-only private role state are
+  implemented pending the next Unity batch verification;
 - five EditMode tests pass and a clean Linux Dedicated Server build starts and
   binds to loopback UDP on Linux;
-- four-client impairment testing, correction metrics, reconnect behavior,
-  owner-private state, and C# room/role parity remain open.
+- four-client impairment testing, correction metrics, restart/reconnect smoke,
+  and C# room/role parity remain open.
 
 Exit gate: the dedicated-server spike passes every acceptance check in
 `technology-stack.md`. If it does not, benchmark Photon Fusion 2 with the same
