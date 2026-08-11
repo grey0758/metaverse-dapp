@@ -25,7 +25,6 @@ namespace MetaverseGame.Bootstrap
         private GUIStyle liveStyle;
         private GUIStyle roleCaptionStyle;
         private GUIStyle roleStyle;
-        private GUIStyle keyStyle;
         private GUIStyle hintStyle;
         private GUIStyle markerStyle;
         private float startedAt;
@@ -82,7 +81,7 @@ namespace MetaverseGame.Bootstrap
 
                 DrawRunStatus(safeArea, manager, playerObject);
                 DrawRoleBadge(safeArea, role);
-                DrawMovementHint(safeArea);
+                DrawTouchHint(safeArea);
 
                 if (playerObject == null)
                 {
@@ -135,7 +134,7 @@ namespace MetaverseGame.Bootstrap
                 detailStyle);
             GUI.Label(
                 new Rect(panel.x + 24f, panel.y + 128f, panel.width - 48f, 24f),
-                "NGO  /  30 HZ  /  LOCAL DEVELOPMENT MATCH",
+                "MOBILE INPUT  /  30 HZ  /  SERVER AUTHORITY",
                 detailStyle);
         }
 
@@ -175,43 +174,48 @@ namespace MetaverseGame.Bootstrap
                 detailStyle);
         }
 
-        private void DrawMovementHint(Rect safeArea)
+        private void DrawTouchHint(Rect safeArea)
         {
-            const float panelWidth = 760f;
+            const float panelWidth = 620f;
             Rect panel = new(
                 safeArea.center.x - panelWidth * 0.5f,
-                safeArea.yMax - 130f,
+                safeArea.yMax - 92f,
                 panelWidth,
-                106f);
+                68f);
             DrawPanel(panel);
             Fill(new Rect(panel.x, panel.y, panel.width, 4f), CyanColor);
 
             GUI.Label(
-                new Rect(panel.x + 22f, panel.y + 18f, 62f, 24f),
-                "MOVE",
+                new Rect(panel.x + 20f, panel.y + 13f, 150f, 22f),
+                "TOUCH CONTROLS",
                 hintStyle);
-
-            DrawKey(new Rect(panel.x + 102f, panel.y + 14f, 34f, 30f), "W");
-            DrawKey(new Rect(panel.x + 62f, panel.y + 52f, 34f, 30f), "A");
-            DrawKey(new Rect(panel.x + 102f, panel.y + 52f, 34f, 30f), "S");
-            DrawKey(new Rect(panel.x + 142f, panel.y + 52f, 34f, 30f), "D");
-
             GUI.Label(
-                new Rect(panel.x + 196f, panel.y + 38f, 190f, 28f),
-                "WASD  /  ARROW KEYS",
-                hintStyle);
+                new Rect(panel.x + 20f, panel.y + 37f, 150f, 18f),
+                "LANDSCAPE MOBILE",
+                detailStyle);
 
             Fill(
-                new Rect(panel.x + 405f, panel.y + 20f, 2f, 66f),
+                new Rect(panel.x + 176f, panel.y + 13f, 2f, 42f),
                 new Color(1f, 1f, 1f, 0.16f));
-            DrawKey(new Rect(panel.x + 438f, panel.y + 37f, 40f, 34f), "E");
             GUI.Label(
-                new Rect(panel.x + 495f, panel.y + 27f, 235f, 26f),
-                "OPEN / CLOSE DOOR",
+                new Rect(panel.x + 198f, panel.y + 12f, 190f, 24f),
+                "LEFT JOYSTICK",
                 hintStyle);
             GUI.Label(
-                new Rect(panel.x + 495f, panel.y + 56f, 235f, 22f),
-                "Walk close to the center door",
+                new Rect(panel.x + 198f, panel.y + 37f, 190f, 18f),
+                "DRAG TO MOVE",
+                detailStyle);
+
+            Fill(
+                new Rect(panel.x + 400f, panel.y + 13f, 2f, 42f),
+                new Color(1f, 1f, 1f, 0.16f));
+            GUI.Label(
+                new Rect(panel.x + 422f, panel.y + 12f, 178f, 24f),
+                "RIGHT ACTION",
+                hintStyle);
+            GUI.Label(
+                new Rect(panel.x + 422f, panel.y + 37f, 178f, 18f),
+                "USE NEAR A DOOR",
                 detailStyle);
         }
 
@@ -263,13 +267,6 @@ namespace MetaverseGame.Bootstrap
             Fill(new Rect(x - 3f, marker.yMax, 6f, 14f), roleColor);
         }
 
-        private void DrawKey(Rect rect, string label)
-        {
-            Fill(rect, new Color(1f, 1f, 1f, 0.09f));
-            DrawBorder(rect, new Color(1f, 1f, 1f, 0.46f), 2f);
-            GUI.Label(rect, label, keyStyle);
-        }
-
         private void DrawPanel(Rect rect)
         {
             Fill(new Rect(rect.x + 6f, rect.y + 7f, rect.width, rect.height), PanelShadowColor);
@@ -314,7 +311,6 @@ namespace MetaverseGame.Bootstrap
                 TextAnchor.MiddleCenter,
                 new Color(0.82f, 0.88f, 0.96f, 1f));
             roleStyle = CreateStyle(30, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
-            keyStyle = CreateStyle(17, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
             hintStyle = CreateStyle(15, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
             markerStyle = CreateStyle(
                 13,

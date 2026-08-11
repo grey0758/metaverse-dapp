@@ -33,7 +33,9 @@ committed scene starts a local host by default and contains:
 - connection approval with persistent session tickets and owner-only private
   role state;
 - an immediate live-status HUD with a private role badge, local-player marker,
-  and keyboard movement/door hints;
+  and mobile touch-control hints;
+- a landscape-only, safe-area-aware mobile control layer with a left virtual
+  joystick and right context-action button;
 - a server-spawned network player prefab;
 - ordered, server-integrated movement with `CharacterController` collision;
 - server-authoritative `NetworkTransform` replication;
@@ -129,10 +131,16 @@ gameplay to both implementations.
 
 ### Input and interaction
 
-The installed Input System is the target abstraction for keyboard, gamepad, and
-touch. The current `Input.GetAxisRaw` code is temporary. All devices should
-produce the same move and context-action commands; mobile controls must not
-fork the game rules.
+Unity Input System is the active input backend. The mobile client writes a
+normalized left-stick value and context-action presses into one input router;
+that router feeds the existing NGO movement RPC and server-validated door RPC.
+Keyboard and gamepad bindings are retained only in the editor and development
+builds for automation and desktop debugging. They do not fork gameplay rules.
+
+Android and iOS are configured for auto-rotation between the two landscape
+orientations only. Touch controls are anchored through `Screen.safeArea` so
+notches, rounded corners, and display cutouts do not cover the joystick or
+action button.
 
 Clients may predict presentation, but only the server may:
 

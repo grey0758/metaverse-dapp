@@ -132,6 +132,9 @@ GameObject:
   - component: {fileID: 281034397}
   - component: {fileID: 281034396}
   - component: {fileID: 281034400}
+  - component: {fileID: 281034401}
+  - component: {fileID: 281034402}
+  - component: {fileID: 281034403}
   m_Layer: 0
   m_Name: Game Systems
   m_TagString: Untagged
@@ -167,6 +170,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c5b15a5ab2f64f939bf6bc46ca6d7cd8, type: 3}
   m_Name:
   m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Bootstrap.GameStartHud
+--- !u!114 &281034401
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281034395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7c2dc82c2bf74a8da7cbe2b4c507a581, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Input.MobileInputRouter
+  moveDeadzone: 0.12
+--- !u!114 &281034402
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281034395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d1f780a398b64a39aae8e3045f79732b, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Bootstrap.MobileOrientationLock
+--- !u!114 &281034403
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 281034395}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f62db26821824ab580bbb764bc12aabe, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Bootstrap.MobileTouchControls
+  referenceResolution: {x: 1280, y: 720}
+  joystickDeadzone: 0.12
 --- !u!114 &281034397
 MonoBehaviour:
   m_ObjectHideFlags: 0

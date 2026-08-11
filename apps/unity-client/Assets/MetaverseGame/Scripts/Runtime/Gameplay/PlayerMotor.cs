@@ -1,3 +1,4 @@
+using MetaverseGame.Input;
 using UnityEngine;
 
 namespace MetaverseGame.Gameplay
@@ -9,20 +10,26 @@ namespace MetaverseGame.Gameplay
         [SerializeField, Min(1f)] private float turnSpeed = 12f;
 
         private CharacterController controller;
+        private MobileInputRouter inputRouter;
 
         public Vector2 CurrentInput { get; private set; }
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            inputRouter = FindFirstObjectByType<MobileInputRouter>();
         }
 
         private void Update()
         {
-            CurrentInput = new Vector2(
-                UnityEngine.Input.GetAxisRaw("Horizontal"),
-                UnityEngine.Input.GetAxisRaw("Vertical"));
-            CurrentInput = Vector2.ClampMagnitude(CurrentInput, 1f);
+            if (inputRouter == null)
+            {
+                inputRouter = FindFirstObjectByType<MobileInputRouter>();
+            }
+
+            CurrentInput = inputRouter != null
+                ? inputRouter.MoveInput
+                : MobileInputRouter.ReadDesktopFallbackMoveInput();
 
             Vector3 direction = new(CurrentInput.x, 0f, CurrentInput.y);
             controller.SimpleMove(direction * speed);

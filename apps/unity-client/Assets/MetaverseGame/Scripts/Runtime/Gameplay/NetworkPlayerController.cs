@@ -1,4 +1,5 @@
 using Unity.Collections;
+using MetaverseGame.Input;
 using Unity.Netcode;
 using UnityEngine;
 
@@ -36,12 +37,14 @@ namespace MetaverseGame.Gameplay
         private uint lastInteractionSequence;
         private float lastInputAt;
         private float nextInputAt;
+        private MobileInputRouter inputRouter;
 
         public string PrivateRole => privateRole.Value.ToString();
 
         private void Awake()
         {
             controller = GetComponent<CharacterController>();
+            inputRouter = FindFirstObjectByType<MobileInputRouter>();
         }
 
         public override void OnNetworkSpawn()
@@ -79,9 +82,17 @@ namespace MetaverseGame.Gameplay
                 return;
             }
 
-            if (UnityEngine.Input.GetKeyDown(KeyCode.E))
+            if (inputRouter == null)
             {
-                TryInteractWithNearestDoor();
+                inputRouter = FindFirstObjectByType<MobileInputRouter>();
+            }
+
+            bool interactionPressed = inputRouter != null
+                ? inputRouter.ConsumeInteractPressed()
+                : MobileInputRouter.ReadDesktopFallbackInteractPressed();
+            if (interactionPressed)
+            {
+                RequestInteraction();
             }
 
             if (Time.unscaledTime < nextInputAt)
@@ -90,9 +101,9 @@ namespace MetaverseGame.Gameplay
             }
 
             nextInputAt = Time.unscaledTime + 1f / inputRate;
-            Vector2 input = new(
-                UnityEngine.Input.GetAxisRaw("Horizontal"),
-                UnityEngine.Input.GetAxisRaw("Vertical"));
+            Vector2 input = inputRouter != null
+                ? inputRouter.MoveInput
+                : MobileInputRouter.ReadDesktopFallbackMoveInput();
             SubmitMoveInputRpc(input, ++localMoveSequence);
         }
 
@@ -140,8 +151,13 @@ namespace MetaverseGame.Gameplay
             lastInputAt = Time.unscaledTime;
         }
 
-        private void TryInteractWithNearestDoor()
+        public void RequestInteraction()
         {
+            if (!IsSpawned || !IsOwner)
+            {
+                return;
+            }
+
             NetworkDoor closest = null;
             float closestDistanceSquared = interactionDistance * interactionDistance;
             NetworkDoor[] doors = FindObjectsByType<NetworkDoor>(FindObjectsSortMode.None);

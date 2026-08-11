@@ -3,7 +3,9 @@
   "rootNamespace": "MetaverseGame",
   "references": [
     "Unity.Collections",
-    "Unity.Netcode.Runtime"
+    "Unity.Netcode.Runtime",
+    "Unity.InputSystem",
+    "UnityEngine.UI"
   ],
   "includePlatforms": [],
   "excludePlatforms": [],

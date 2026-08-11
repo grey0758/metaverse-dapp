@@ -8,9 +8,12 @@ development scene without binary assets:
 
 `Metaverse DApp > Create Development Scene`
 
-The generated scene connects to `ws://127.0.0.1:8787` by default and supports a
-local keyboard movement prototype. Mobile controls, wallet SDK integration,
-production art, voice, and account persistence remain later vertical slices.
+The committed development scene starts a local NGO host by default. Its client
+is landscape-mobile-first: Unity Input System feeds a safe-area-aware left
+virtual joystick and right context-action button into the same authoritative
+movement and door commands. Keyboard/gamepad bindings remain available only as
+an editor or development-build fallback. Wallet SDK integration, production
+art, voice, and account persistence remain later vertical slices.
 
 Batch build entry points:
 
