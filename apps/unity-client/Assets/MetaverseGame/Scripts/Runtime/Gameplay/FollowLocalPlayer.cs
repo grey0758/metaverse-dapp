@@ -5,7 +5,7 @@ namespace MetaverseGame.Gameplay
 {
     public sealed class FollowLocalPlayer : MonoBehaviour
     {
-        [SerializeField] private Vector3 offset = new(0f, 9f, -8f);
+        [SerializeField] private Vector3 offset = new(0f, 10.5f, -5.5f);
         [SerializeField, Min(0.1f)] private float smoothing = 8f;
 
         private void LateUpdate()

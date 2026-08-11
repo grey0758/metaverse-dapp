@@ -170,7 +170,7 @@ namespace MetaverseGame.Bootstrap
 
             GUI.Label(
                 new Rect(panel.x + 18f, panel.y + 132f, panel.width - 36f, 22f),
-                "OWNER-ONLY  /  VISIBLE TO YOU",
+                "OWNER ONLY  /  PRIVATE",
                 detailStyle);
         }
 

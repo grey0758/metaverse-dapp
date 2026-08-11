@@ -242,9 +242,21 @@ namespace MetaverseGame.Bootstrap
 
         private void ConfigureExistingRoom()
         {
-            ApplyMaterial("Low Poly Arena", stoneMaterial);
+            GameObject ground = ApplyMaterial("Low Poly Arena", stoneMaterial);
+            if (ground != null)
+            {
+                ground.transform.localScale = new Vector3(3.6f, 1f, 3.6f);
+            }
+
             ApplyMaterial("North Wall", wallMaterial);
-            ApplyMaterial("South Wall", wallMaterial);
+            GameObject southWall = ApplyMaterial("South Wall", wallMaterial);
+            Renderer southWallRenderer = southWall != null
+                ? southWall.GetComponent<Renderer>()
+                : null;
+            if (southWallRenderer != null)
+            {
+                southWallRenderer.enabled = false;
+            }
             ApplyMaterial("East Wall", wallMaterial);
             ApplyMaterial("West Wall", wallMaterial);
 
@@ -305,16 +317,16 @@ namespace MetaverseGame.Bootstrap
             }
 
             CreateBox(
-                "South Walnut Feature Wall",
-                new Vector3(0f, 1.5f, -11.67f),
-                new Vector3(19f, 2.64f, 0.08f),
+                "South Cutaway Wall",
+                new Vector3(0f, 0.31f, -11.67f),
+                new Vector3(23.3f, 0.5f, 0.12f),
                 walnutMaterial);
             for (int index = 0; index < 21; index++)
             {
                 float x = -9f + index * 0.9f;
                 CreateBox(
-                    "Walnut Wall Slat",
-                    new Vector3(x, 1.5f, -11.60f),
+                    "North Walnut Wall Slat",
+                    new Vector3(x, 1.5f, 11.60f),
                     new Vector3(0.08f, 2.48f, 0.08f),
                     index % 5 == 0 ? brassMaterial : metalMaterial);
             }

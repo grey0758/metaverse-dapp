@@ -776,7 +776,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffaa5a95c8369f24c9bd0b3f7ccefeeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Gameplay.FollowLocalPlayer
-  offset: {x: 0, y: 9, z: -8}
+  offset: {x: 0, y: 10.5, z: -5.5}
   smoothing: 8
 --- !u!81 &825394254
 AudioListener:
