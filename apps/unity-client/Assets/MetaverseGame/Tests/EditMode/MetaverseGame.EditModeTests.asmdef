@@ -2,7 +2,8 @@
   "name": "MetaverseGame.EditModeTests",
   "rootNamespace": "MetaverseGame.Tests",
   "references": [
-    "MetaverseGame.Runtime"
+    "MetaverseGame.Runtime",
+    "Unity.Netcode.Runtime"
   ],
   "optionalUnityReferences": [
     "TestAssemblies"
