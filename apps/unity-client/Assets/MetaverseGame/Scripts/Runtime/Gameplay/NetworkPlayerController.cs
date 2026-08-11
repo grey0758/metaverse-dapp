@@ -10,12 +10,12 @@ namespace MetaverseGame.Gameplay
     {
         private static readonly Vector3[] SpawnPositions =
         {
-            new(-4f, 1f, -4f),
-            new(4f, 1f, -4f),
-            new(-4f, 1f, 6f),
-            new(4f, 1f, 6f),
-            new(0f, 1f, -7f),
-            new(0f, 1f, 8f),
+            new(0f, 1f, -10.6f),
+            new(-7.5f, 1f, -7.5f),
+            new(7.5f, 1f, -7.5f),
+            new(-7.5f, 1f, -1f),
+            new(7.5f, 1f, -1f),
+            new(0f, 1f, 6.5f),
         };
 
         [SerializeField, Min(0.1f)] private float speed = 4f;

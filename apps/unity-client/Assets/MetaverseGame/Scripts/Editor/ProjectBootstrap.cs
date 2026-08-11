@@ -45,16 +45,22 @@ namespace MetaverseGame.Editor
             GameObject camera = new("Main Camera");
             camera.tag = "MainCamera";
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 11f, -10f),
-                Quaternion.Euler(38f, 0f, 0f));
-            camera.AddComponent<Camera>();
+                new Vector3(0f, 10f, -13f),
+                Quaternion.Euler(34f, 0f, 0f));
+            Camera sceneCamera = camera.AddComponent<Camera>();
+            sceneCamera.clearFlags = CameraClearFlags.SolidColor;
+            sceneCamera.backgroundColor = new Color(0.035f, 0.055f, 0.06f);
+            sceneCamera.fieldOfView = 52f;
             camera.AddComponent<AudioListener>();
             camera.AddComponent<FollowLocalPlayer>();
 
             GameObject light = new("Sun");
             Light sun = light.AddComponent<Light>();
             sun.type = LightType.Directional;
-            sun.intensity = 1.2f;
+            sun.color = new Color(1f, 0.88f, 0.72f);
+            sun.intensity = 0.78f;
+            sun.shadows = LightShadows.Soft;
+            sun.shadowStrength = 0.62f;
             light.transform.rotation = Quaternion.Euler(48f, -32f, 0f);
 
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
@@ -80,6 +86,7 @@ namespace MetaverseGame.Editor
             UnityTransport transport = systems.AddComponent<UnityTransport>();
             systems.AddComponent<DirectNetworkBootstrap>();
             systems.AddComponent<GameStartHud>();
+            systems.AddComponent<BoardroomEnvironment>();
             systems.AddComponent<MetaverseGame.Input.MobileInputRouter>();
             systems.AddComponent<MobileOrientationLock>();
             systems.AddComponent<MobileTouchControls>();
