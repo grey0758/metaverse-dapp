@@ -37,6 +37,8 @@ namespace MetaverseGame.Gameplay
         private float lastInputAt;
         private float nextInputAt;
 
+        public string PrivateRole => privateRole.Value.ToString();
+
         private void Awake()
         {
             controller = GetComponent<CharacterController>();

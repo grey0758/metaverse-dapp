@@ -79,6 +79,7 @@ namespace MetaverseGame.Editor
             NetworkManager networkManager = systems.AddComponent<NetworkManager>();
             UnityTransport transport = systems.AddComponent<UnityTransport>();
             systems.AddComponent<DirectNetworkBootstrap>();
+            systems.AddComponent<GameStartHud>();
             networkManager.NetworkConfig.NetworkTransport = transport;
             networkManager.NetworkConfig.PlayerPrefab = playerPrefab;
             networkManager.NetworkConfig.TickRate = 30;

@@ -32,6 +32,8 @@ committed scene starts a local host by default and contains:
 - a 30 Hz `NetworkManager` and direct-IP bootstrap;
 - connection approval with persistent session tickets and owner-only private
   role state;
+- an immediate live-status HUD with a private role badge, local-player marker,
+  and keyboard movement/door hints;
 - a server-spawned network player prefab;
 - ordered, server-integrated movement with `CharacterController` collision;
 - server-authoritative `NetworkTransform` replication;
