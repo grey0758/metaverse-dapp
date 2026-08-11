@@ -149,10 +149,10 @@ namespace MetaverseGame.Bootstrap
                 Color.white,
                 TextAnchor.MiddleCenter);
             RectTransform labelRect = label.rectTransform;
-            labelRect.anchorMin = new Vector2(0.5f, 0f);
-            labelRect.anchorMax = new Vector2(0.5f, 0f);
-            labelRect.pivot = new Vector2(0.5f, 1f);
-            labelRect.anchoredPosition = new Vector2(0f, -12f);
+            labelRect.anchorMin = new Vector2(0.5f, 1f);
+            labelRect.anchorMax = new Vector2(0.5f, 1f);
+            labelRect.pivot = new Vector2(0.5f, 0f);
+            labelRect.anchoredPosition = new Vector2(0f, 10f);
             labelRect.sizeDelta = new Vector2(180f, 30f);
         }
 
@@ -190,10 +190,10 @@ namespace MetaverseGame.Bootstrap
                 Color.white,
                 TextAnchor.MiddleCenter);
             RectTransform labelRect = label.rectTransform;
-            labelRect.anchorMin = new Vector2(0.5f, 0f);
-            labelRect.anchorMax = new Vector2(0.5f, 0f);
-            labelRect.pivot = new Vector2(0.5f, 1f);
-            labelRect.anchoredPosition = new Vector2(0f, -15f);
+            labelRect.anchorMin = new Vector2(0.5f, 1f);
+            labelRect.anchorMax = new Vector2(0.5f, 1f);
+            labelRect.pivot = new Vector2(0.5f, 0f);
+            labelRect.anchoredPosition = new Vector2(0f, 10f);
             labelRect.sizeDelta = new Vector2(180f, 30f);
         }
 
