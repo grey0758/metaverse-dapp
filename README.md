@@ -63,5 +63,5 @@ The implementation order and release gates are in the
 [vertical-slice roadmap](docs/roadmap.md). The first runnable Dedicated Server
 evidence is in the
 [2026-08-07 build record](docs/builds/2026-08-07-linux-dedicated-server.md).
-The paired Windows and Android boardroom validation is in the
-[2026-08-12 build record](docs/builds/2026-08-12-windows-android-boardroom.md).
+The paired Windows and Android Plato boardroom validation is in the
+[latest build record](docs/builds/2026-08-12-a545ec2-plato-boardroom.md).
