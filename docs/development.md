@@ -177,3 +177,10 @@ Use a clean checkout on a separately managed Windows build worker. It must not
 receive local Unity `Library`, `Temp`, `Logs`, or `obj` folders. A real build
 requires a clean commit/tag, a Unity license, the pinned editor/modules, and an
 artifact manifest with SHA-256.
+
+The retained `greywin001` evidence for commit `87ef2b0` is in the
+[2026-08-12 Windows and Android build record](builds/2026-08-12-windows-android-boardroom.md).
+It covers 16 passing EditMode tests, texture import validation, a Windows
+development player, an arm64 IL2CPP Android development APK, and a real player
+screenshot. It does not replace Android physical-device touch, safe-area,
+lifecycle, performance, thermal, or battery testing.

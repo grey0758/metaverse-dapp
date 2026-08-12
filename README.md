@@ -7,9 +7,10 @@ The first vertical slice is deliberately game-first:
 
 - guest players can authenticate without a wallet;
 - the authoritative game server owns rooms, roles, movement, and match state;
-- the Unity client contains a committed NGO development scene, direct-IP
-  bootstrap, server-owned movement and door interaction, plus repository-owned
-  player and Dedicated Server build entry points;
+- the Unity client contains a committed NGO development scene, an authored
+  executive boardroom, landscape touch controls, direct-IP bootstrap,
+  server-owned movement and door interaction, plus repository-owned player and
+  Dedicated Server build entry points;
 - the Web DApp exposes optional wallet connection and SIWE-style challenge
   plumbing without selecting a production chain;
 - the contract package contains an owner-operated ERC-1155 collection skeleton;
@@ -62,3 +63,5 @@ The implementation order and release gates are in the
 [vertical-slice roadmap](docs/roadmap.md). The first runnable Dedicated Server
 evidence is in the
 [2026-08-07 build record](docs/builds/2026-08-07-linux-dedicated-server.md).
+The paired Windows and Android boardroom validation is in the
+[2026-08-12 build record](docs/builds/2026-08-12-windows-android-boardroom.md).
