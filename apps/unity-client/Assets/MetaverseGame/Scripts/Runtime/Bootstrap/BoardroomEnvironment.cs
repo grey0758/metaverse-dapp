@@ -10,6 +10,9 @@ namespace MetaverseGame.Bootstrap
     public sealed class BoardroomEnvironment : MonoBehaviour
     {
         private const string GeneratedRootName = "Boardroom Environment";
+        private const string GraphiteStoneResource = "Boardroom/GraphiteStone";
+        private const string SmokedWalnutResource = "Boardroom/SmokedWalnut";
+        private const string StrategyDisplayResource = "Boardroom/StrategyDisplay";
 
         private readonly List<Material> runtimeMaterials = new();
         private readonly List<Texture2D> runtimeTextures = new();
@@ -97,16 +100,19 @@ namespace MetaverseGame.Bootstrap
             surfaceShader ??= Shader.Find("Universal Render Pipeline/Lit");
             surfaceShader ??= Shader.Find("Diffuse");
 
-            Texture2D stoneTexture = CreateStoneTexture();
-            Texture2D woodTexture = CreateWoodTexture();
+            Texture2D stoneTexture = Resources.Load<Texture2D>(GraphiteStoneResource)
+                ?? CreateStoneTexture();
+            Texture2D woodTexture = Resources.Load<Texture2D>(SmokedWalnutResource)
+                ?? CreateWoodTexture();
             Texture2D fabricTexture = CreateFabricTexture();
-            Texture2D dashboardTexture = CreateDashboardTexture();
+            Texture2D dashboardTexture = Resources.Load<Texture2D>(StrategyDisplayResource)
+                ?? CreateDashboardTexture();
 
             stoneMaterial = CreateMaterial(
                 "Graphite Stone",
-                new Color(0.18f, 0.20f, 0.21f),
-                0.18f,
-                0.78f,
+                new Color(0.76f, 0.79f, 0.80f),
+                0.04f,
+                0.56f,
                 stoneTexture,
                 new Vector2(6f, 6f));
             wallMaterial = CreateMaterial(
@@ -116,9 +122,9 @@ namespace MetaverseGame.Bootstrap
                 0.34f);
             walnutMaterial = CreateMaterial(
                 "Smoked Walnut",
-                new Color(0.38f, 0.20f, 0.10f),
-                0.05f,
-                0.67f,
+                new Color(0.82f, 0.72f, 0.62f),
+                0.02f,
+                0.64f,
                 woodTexture,
                 new Vector2(3f, 1f));
             metalMaterial = CreateMaterial(
@@ -974,6 +980,7 @@ namespace MetaverseGame.Bootstrap
             const int width = 256;
             const int height = 144;
             Texture2D texture = CreateTexture("Boardroom Strategy Dashboard", width, height, false);
+            texture.wrapMode = TextureWrapMode.Clamp;
             Color[] pixels = new Color[width * height];
             Color background = new(0.018f, 0.035f, 0.045f);
 

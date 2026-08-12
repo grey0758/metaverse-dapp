@@ -33,12 +33,15 @@ committed scene starts a local host by default and contains:
 - connection approval with persistent session tickets and owner-only private
   role state;
 - an immediate live-status HUD with a private role badge, local-player marker,
-  and mobile touch-control hints;
+  and a compact session status;
 - a mobile-friendly executive boardroom with procedural stone, walnut, glass,
   leather, metal, and display materials, collision-aware furniture, and warm
   architectural lighting;
+- authored graphite stone, smoked walnut, and abstract strategy-display
+  textures under `Assets/MetaverseGame/Resources/Boardroom/`, with procedural
+  fallbacks and mobile platform import limits;
 - a landscape-only, safe-area-aware mobile control layer with a left virtual
-  joystick and right context-action button;
+  floating joystick capture zone and right context-action button;
 - a server-spawned network player prefab;
 - ordered, server-integrated movement with `CharacterController` collision;
 - server-authoritative `NetworkTransform` replication;

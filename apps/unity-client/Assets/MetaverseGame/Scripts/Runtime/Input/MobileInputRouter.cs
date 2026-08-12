@@ -265,6 +265,49 @@ namespace MetaverseGame.Input
             return input / magnitude * remappedMagnitude;
         }
 
+        public static Vector2 NormalizeJoystickDelta(
+            Vector2 pointerPosition,
+            Vector2 center,
+            float radius)
+        {
+            if (!IsFinite(pointerPosition.x) || !IsFinite(pointerPosition.y) ||
+                !IsFinite(center.x) || !IsFinite(center.y) ||
+                !IsFinite(radius) || radius <= 0f)
+            {
+                return Vector2.zero;
+            }
+
+            return Vector2.ClampMagnitude((pointerPosition - center) / radius, 1f);
+        }
+
+        public static Vector2 ClampFloatingCenter(
+            Vector2 requestedCenter,
+            Rect bounds,
+            float visualRadius,
+            float margin)
+        {
+            if (!IsFinite(requestedCenter.x) || !IsFinite(requestedCenter.y) ||
+                !IsFinite(bounds.xMin) || !IsFinite(bounds.yMin) ||
+                !IsFinite(bounds.xMax) || !IsFinite(bounds.yMax))
+            {
+                return bounds.center;
+            }
+
+            float inset = Mathf.Max(0f, visualRadius) + Mathf.Max(0f, margin);
+            float minX = bounds.xMin + inset;
+            float maxX = bounds.xMax - inset;
+            float minY = bounds.yMin + inset;
+            float maxY = bounds.yMax - inset;
+
+            float x = minX <= maxX
+                ? Mathf.Clamp(requestedCenter.x, minX, maxX)
+                : bounds.center.x;
+            float y = minY <= maxY
+                ? Mathf.Clamp(requestedCenter.y, minY, maxY)
+                : bounds.center.y;
+            return new Vector2(x, y);
+        }
+
         private static bool IsFinite(float value)
         {
             return !float.IsNaN(value) && !float.IsInfinity(value);

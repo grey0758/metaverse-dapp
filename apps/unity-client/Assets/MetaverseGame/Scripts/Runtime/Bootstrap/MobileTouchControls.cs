@@ -109,10 +109,22 @@ namespace MetaverseGame.Bootstrap
 
         private void CreateJoystick(MobileInputRouter inputRouter, Sprite circleSprite)
         {
-            GameObject joystickObject = CreateRectObject("Move Joystick", safeAreaRoot);
+            GameObject zoneObject = CreateRectObject("Floating Joystick Zone", safeAreaRoot);
+            RectTransform zoneRect = zoneObject.GetComponent<RectTransform>();
+            zoneRect.anchorMin = Vector2.zero;
+            zoneRect.anchorMax = new Vector2(0.52f, 0.76f);
+            zoneRect.offsetMin = Vector2.zero;
+            zoneRect.offsetMax = Vector2.zero;
+
+            Image captureSurface = zoneObject.AddComponent<Image>();
+            captureSurface.color = new Color(0f, 0f, 0f, 0.001f);
+            captureSurface.raycastTarget = true;
+
+            GameObject joystickObject = CreateRectObject("Move Joystick", zoneRect);
             RectTransform joystickRect = joystickObject.GetComponent<RectTransform>();
-            AnchorAt(joystickRect, new Vector2(0f, 0f), new Vector2(150f, 148f));
+            AnchorAt(joystickRect, new Vector2(0.5f, 0.5f), Vector2.zero);
             joystickRect.sizeDelta = new Vector2(220f, 220f);
+            CanvasGroup visualGroup = joystickObject.AddComponent<CanvasGroup>();
 
             Image background = joystickObject.AddComponent<Image>();
             background.sprite = circleSprite;
@@ -138,22 +150,15 @@ namespace MetaverseGame.Bootstrap
             handle.raycastTarget = false;
             AddOutline(handle, new Color(1f, 1f, 1f, 0.72f), 2f);
 
-            VirtualJoystick joystick = joystickObject.AddComponent<VirtualJoystick>();
-            joystick.Configure(inputRouter, handleRect, 82f, joystickDeadzone);
-
-            Text label = CreateText(
-                "Move Label",
+            VirtualJoystick joystick = zoneObject.AddComponent<VirtualJoystick>();
+            joystick.Configure(
+                inputRouter,
                 joystickRect,
-                "MOVE",
-                18,
-                Color.white,
-                TextAnchor.MiddleCenter);
-            RectTransform labelRect = label.rectTransform;
-            labelRect.anchorMin = new Vector2(0.5f, 1f);
-            labelRect.anchorMax = new Vector2(0.5f, 1f);
-            labelRect.pivot = new Vector2(0.5f, 0f);
-            labelRect.anchoredPosition = new Vector2(0f, 10f);
-            labelRect.sizeDelta = new Vector2(180f, 30f);
+                handleRect,
+                82f,
+                110f,
+                joystickDeadzone,
+                visualGroup);
         }
 
         private void CreateActionButton(MobileInputRouter inputRouter, Sprite circleSprite)
@@ -161,7 +166,7 @@ namespace MetaverseGame.Bootstrap
             GameObject buttonObject = CreateRectObject("Context Action Button", safeAreaRoot);
             RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
             AnchorAt(buttonRect, new Vector2(1f, 0f), new Vector2(-140f, 146f));
-            buttonRect.sizeDelta = new Vector2(158f, 158f);
+            buttonRect.sizeDelta = new Vector2(172f, 172f);
 
             Image buttonImage = buttonObject.AddComponent<Image>();
             buttonImage.sprite = circleSprite;
@@ -175,26 +180,12 @@ namespace MetaverseGame.Bootstrap
             Text buttonText = CreateText(
                 "Action Text",
                 buttonRect,
-                "USE\nDOOR",
-                22,
+                "USE",
+                26,
                 Color.white,
                 TextAnchor.MiddleCenter);
             Stretch(buttonText.rectTransform, 12f);
             buttonText.fontStyle = FontStyle.Bold;
-
-            Text label = CreateText(
-                "Action Label",
-                buttonRect,
-                "ACTION",
-                18,
-                Color.white,
-                TextAnchor.MiddleCenter);
-            RectTransform labelRect = label.rectTransform;
-            labelRect.anchorMin = new Vector2(0.5f, 1f);
-            labelRect.anchorMax = new Vector2(0.5f, 1f);
-            labelRect.pivot = new Vector2(0.5f, 0f);
-            labelRect.anchoredPosition = new Vector2(0f, 10f);
-            labelRect.sizeDelta = new Vector2(180f, 30f);
         }
 
         private void RefreshSafeArea(bool force)

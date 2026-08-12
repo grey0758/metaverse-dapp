@@ -13,13 +13,15 @@ namespace MetaverseGame.Bootstrap
     public sealed class MobileActionButton : MonoBehaviour,
         IPointerDownHandler,
         IPointerUpHandler,
-        IPointerExitHandler,
-        IPointerClickHandler
+        IPointerExitHandler
     {
+        private const int NoPointer = int.MinValue;
+
         private Image image;
         private MobileInputRouter inputRouter;
         private Color idleColor;
         private Color pressedColor;
+        private int activePointerId = NoPointer;
 
         public void Configure(
             MobileInputRouter router,
@@ -36,22 +38,34 @@ namespace MetaverseGame.Bootstrap
 
         public void OnPointerDown(PointerEventData eventData)
         {
+            if (activePointerId != NoPointer)
+            {
+                return;
+            }
+
+            activePointerId = eventData.pointerId;
             ApplyVisualState(true);
+            inputRouter?.PressInteract();
         }
 
         public void OnPointerUp(PointerEventData eventData)
         {
+            if (eventData.pointerId != activePointerId)
+            {
+                return;
+            }
+
+            activePointerId = NoPointer;
             ApplyVisualState(false);
         }
 
         public void OnPointerExit(PointerEventData eventData)
         {
-            ApplyVisualState(false);
-        }
-
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            inputRouter?.PressInteract();
+            if (eventData.pointerId == activePointerId)
+            {
+                activePointerId = NoPointer;
+                ApplyVisualState(false);
+            }
         }
 
         private void ApplyVisualState(bool pressed)
@@ -66,6 +80,7 @@ namespace MetaverseGame.Bootstrap
 
         private void OnDisable()
         {
+            activePointerId = NoPointer;
             ApplyVisualState(false);
         }
     }

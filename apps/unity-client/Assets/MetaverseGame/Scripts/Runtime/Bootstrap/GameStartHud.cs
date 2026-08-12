@@ -25,7 +25,6 @@ namespace MetaverseGame.Bootstrap
         private GUIStyle liveStyle;
         private GUIStyle roleCaptionStyle;
         private GUIStyle roleStyle;
-        private GUIStyle hintStyle;
         private GUIStyle markerStyle;
         private float startedAt;
 
@@ -81,7 +80,6 @@ namespace MetaverseGame.Bootstrap
 
                 DrawRunStatus(safeArea, manager, playerObject);
                 DrawRoleBadge(safeArea, role);
-                DrawTouchHint(safeArea);
 
                 if (playerObject == null)
                 {
@@ -106,41 +104,37 @@ namespace MetaverseGame.Bootstrap
             NetworkManager manager,
             NetworkObject playerObject)
         {
-            Rect panel = new(safeArea.x + 24f, safeArea.y + 24f, 440f, 174f);
+            Rect panel = new(safeArea.x + 24f, safeArea.y + 24f, 360f, 104f);
             DrawPanel(panel);
             Fill(new Rect(panel.x, panel.y, 6f, panel.height), CyanColor);
 
             GUI.Label(
-                new Rect(panel.x + 24f, panel.y + 15f, 280f, 38f),
+                new Rect(panel.x + 24f, panel.y + 12f, 230f, 32f),
                 "FEATHERFALL",
                 titleStyle);
 
             float heartbeat = 0.65f + (Mathf.Sin(Time.unscaledTime * 5f) + 1f) * 0.175f;
             Fill(
-                new Rect(panel.xMax - 116f, panel.y + 24f, 10f, 10f),
+                new Rect(panel.xMax - 102f, panel.y + 23f, 9f, 9f),
                 new Color(LiveColor.r, LiveColor.g, LiveColor.b, heartbeat));
             GUI.Label(
-                new Rect(panel.xMax - 98f, panel.y + 16f, 78f, 28f),
-                $"LIVE {FormatElapsed(Time.realtimeSinceStartup - startedAt)}",
+                new Rect(panel.xMax - 86f, panel.y + 14f, 68f, 28f),
+                FormatElapsed(Time.realtimeSinceStartup - startedAt),
                 liveStyle);
 
             GUI.Label(
-                new Rect(panel.x + 24f, panel.y + 58f, panel.width - 48f, 30f),
-                "GAME IS RUNNING",
+                new Rect(panel.x + 24f, panel.y + 51f, panel.width - 48f, 24f),
+                ResolveSessionState(manager, playerObject),
                 statusStyle);
             GUI.Label(
-                new Rect(panel.x + 24f, panel.y + 96f, panel.width - 48f, 24f),
+                new Rect(panel.x + 24f, panel.y + 76f, panel.width - 48f, 20f),
                 ResolveConnectionLabel(manager, playerObject),
-                detailStyle);
-            GUI.Label(
-                new Rect(panel.x + 24f, panel.y + 128f, panel.width - 48f, 24f),
-                "MOBILE INPUT  /  30 HZ  /  SERVER AUTHORITY",
                 detailStyle);
         }
 
         private void DrawRoleBadge(Rect safeArea, string role)
         {
-            Rect panel = new(safeArea.xMax - 264f, safeArea.y + 24f, 240f, 174f);
+            Rect panel = new(safeArea.xMax - 244f, safeArea.y + 24f, 220f, 126f);
             DrawPanel(panel);
 
             string roleLabel = string.IsNullOrWhiteSpace(role)
@@ -150,73 +144,23 @@ namespace MetaverseGame.Bootstrap
 
             GUI.Label(
                 new Rect(panel.x + 18f, panel.y + 14f, panel.width - 36f, 24f),
-                "YOUR PRIVATE ROLE",
+                "PRIVATE ROLE",
                 roleCaptionStyle);
             Fill(
-                new Rect(panel.x + 18f, panel.y + 48f, panel.width - 36f, 70f),
+                new Rect(panel.x + 18f, panel.y + 43f, panel.width - 36f, 65f),
                 new Color(roleColor.r, roleColor.g, roleColor.b, 0.22f));
             DrawBorder(
-                new Rect(panel.x + 18f, panel.y + 48f, panel.width - 36f, 70f),
+                new Rect(panel.x + 18f, panel.y + 43f, panel.width - 36f, 65f),
                 roleColor,
                 2f);
 
             Color previousColor = roleStyle.normal.textColor;
             roleStyle.normal.textColor = roleColor;
             GUI.Label(
-                new Rect(panel.x + 18f, panel.y + 56f, panel.width - 36f, 52f),
+                new Rect(panel.x + 18f, panel.y + 50f, panel.width - 36f, 50f),
                 roleLabel,
                 roleStyle);
             roleStyle.normal.textColor = previousColor;
-
-            GUI.Label(
-                new Rect(panel.x + 18f, panel.y + 132f, panel.width - 36f, 22f),
-                "OWNER ONLY  /  PRIVATE",
-                detailStyle);
-        }
-
-        private void DrawTouchHint(Rect safeArea)
-        {
-            const float panelWidth = 620f;
-            Rect panel = new(
-                safeArea.center.x - panelWidth * 0.5f,
-                safeArea.yMax - 92f,
-                panelWidth,
-                68f);
-            DrawPanel(panel);
-            Fill(new Rect(panel.x, panel.y, panel.width, 4f), CyanColor);
-
-            GUI.Label(
-                new Rect(panel.x + 20f, panel.y + 13f, 150f, 22f),
-                "TOUCH CONTROLS",
-                hintStyle);
-            GUI.Label(
-                new Rect(panel.x + 20f, panel.y + 37f, 150f, 18f),
-                "LANDSCAPE MOBILE",
-                detailStyle);
-
-            Fill(
-                new Rect(panel.x + 176f, panel.y + 13f, 2f, 42f),
-                new Color(1f, 1f, 1f, 0.16f));
-            GUI.Label(
-                new Rect(panel.x + 198f, panel.y + 12f, 190f, 24f),
-                "LEFT JOYSTICK",
-                hintStyle);
-            GUI.Label(
-                new Rect(panel.x + 198f, panel.y + 37f, 190f, 18f),
-                "DRAG TO MOVE",
-                detailStyle);
-
-            Fill(
-                new Rect(panel.x + 400f, panel.y + 13f, 2f, 42f),
-                new Color(1f, 1f, 1f, 0.16f));
-            GUI.Label(
-                new Rect(panel.x + 422f, panel.y + 12f, 178f, 24f),
-                "RIGHT ACTION",
-                hintStyle);
-            GUI.Label(
-                new Rect(panel.x + 422f, panel.y + 37f, 178f, 18f),
-                "USE NEAR A DOOR",
-                detailStyle);
         }
 
         private void DrawSpawningNotice(Rect safeArea)
@@ -297,8 +241,8 @@ namespace MetaverseGame.Bootstrap
                 return;
             }
 
-            titleStyle = CreateStyle(28, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
-            statusStyle = CreateStyle(20, FontStyle.Bold, TextAnchor.MiddleLeft, LiveColor);
+            titleStyle = CreateStyle(22, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
+            statusStyle = CreateStyle(16, FontStyle.Bold, TextAnchor.MiddleLeft, LiveColor);
             detailStyle = CreateStyle(
                 13,
                 FontStyle.Normal,
@@ -310,8 +254,7 @@ namespace MetaverseGame.Bootstrap
                 FontStyle.Bold,
                 TextAnchor.MiddleCenter,
                 new Color(0.82f, 0.88f, 0.96f, 1f));
-            roleStyle = CreateStyle(30, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
-            hintStyle = CreateStyle(15, FontStyle.Bold, TextAnchor.MiddleLeft, Color.white);
+            roleStyle = CreateStyle(28, FontStyle.Bold, TextAnchor.MiddleCenter, Color.white);
             markerStyle = CreateStyle(
                 13,
                 FontStyle.Bold,
@@ -383,6 +326,17 @@ namespace MetaverseGame.Bootstrap
                 return "CONNECTING TO HOST...";
             }
             return "NETWORK READY";
+        }
+
+        private static string ResolveSessionState(
+            NetworkManager manager,
+            NetworkObject playerObject)
+        {
+            if (manager == null || !manager.IsListening)
+            {
+                return "JOINING SESSION";
+            }
+            return playerObject == null ? "PREPARING PLAYER" : "BOARDROOM ONLINE";
         }
 
         private static string FormatElapsed(float elapsedSeconds)
