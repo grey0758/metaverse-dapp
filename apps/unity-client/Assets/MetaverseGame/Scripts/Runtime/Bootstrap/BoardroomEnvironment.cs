@@ -14,6 +14,14 @@ namespace MetaverseGame.Bootstrap
         private const string SmokedWalnutResource = "Boardroom/SmokedWalnut";
         private const string StrategyDisplayResource = "Boardroom/StrategyDisplay";
 
+        public const int ConferenceTableCount = 3;
+        public const int SeatsPerTableSide = 4;
+        public const int WindowBayCount = 5;
+        public const int AcousticSlatCount = 35;
+        public const float RoomHalfExtent = 12f;
+        public const float StrategyDisplayWidth = 5f;
+        public const float StrategyDisplayHeight = StrategyDisplayWidth * 9f / 16f;
+
         private readonly List<Material> runtimeMaterials = new();
         private readonly List<Texture2D> runtimeTextures = new();
         private readonly HashSet<int> styledPlayers = new();
@@ -23,6 +31,10 @@ namespace MetaverseGame.Bootstrap
         private Material stoneMaterial;
         private Material wallMaterial;
         private Material walnutMaterial;
+        private Material slatMaterial;
+        private Material acousticBlueMaterial;
+        private Material ceilingMaterial;
+        private Material windowGlassMaterial;
         private Material metalMaterial;
         private Material brassMaterial;
         private Material leatherMaterial;
@@ -109,41 +121,66 @@ namespace MetaverseGame.Bootstrap
                 ?? CreateDashboardTexture();
 
             stoneMaterial = CreateMaterial(
-                "Graphite Stone",
-                new Color(0.76f, 0.79f, 0.80f),
-                0.04f,
-                0.56f,
+                "Plato Cool Gray Carpet",
+                new Color(0.86f, 0.88f, 0.88f),
+                0.0f,
+                0.28f,
                 stoneTexture,
-                new Vector2(6f, 6f));
+                new Vector2(7f, 9f));
             wallMaterial = CreateMaterial(
-                "Architectural Plaster",
-                new Color(0.32f, 0.34f, 0.34f),
+                "Warm White Architectural Wall",
+                new Color(0.82f, 0.84f, 0.83f),
                 0.02f,
-                0.34f);
+                0.24f);
             walnutMaterial = CreateMaterial(
-                "Smoked Walnut",
-                new Color(0.82f, 0.72f, 0.62f),
+                "Plato Light Honey Oak",
+                new Color(0.94f, 0.79f, 0.56f),
                 0.02f,
-                0.64f,
+                0.48f,
                 woodTexture,
-                new Vector2(3f, 1f));
+                new Vector2(2.8f, 1.2f));
+            slatMaterial = CreateMaterial(
+                "Warm Oak Acoustic Slats",
+                new Color(0.58f, 0.38f, 0.22f),
+                0.02f,
+                0.4f,
+                woodTexture,
+                new Vector2(0.55f, 3.8f));
+            acousticBlueMaterial = CreateMaterial(
+                "Cobalt Acoustic Felt",
+                new Color(0.025f, 0.12f, 0.35f),
+                0.0f,
+                0.22f,
+                fabricTexture,
+                new Vector2(3f, 4f));
+            ceilingMaterial = CreateMaterial(
+                "Ceiling Tile",
+                new Color(0.91f, 0.93f, 0.93f),
+                0.0f,
+                0.18f);
+            windowGlassMaterial = CreateMaterial(
+                "Cool Window Glass",
+                new Color(0.34f, 0.58f, 0.68f, 0.34f),
+                0.0f,
+                0.72f,
+                transparent: true);
             metalMaterial = CreateMaterial(
-                "Blackened Steel",
-                new Color(0.055f, 0.065f, 0.07f),
+                "Window and Chair Graphite",
+                new Color(0.025f, 0.032f, 0.04f),
                 0.86f,
                 0.82f);
             brassMaterial = CreateMaterial(
-                "Brushed Brass",
-                new Color(0.58f, 0.39f, 0.15f),
-                0.78f,
-                0.72f);
+                "Soft Champagne Detail",
+                new Color(0.58f, 0.42f, 0.22f),
+                0.5f,
+                0.58f);
             leatherMaterial = CreateMaterial(
-                "Deep Teal Leather",
-                new Color(0.045f, 0.14f, 0.15f),
-                0.08f,
-                0.62f,
+                "Black Mesh Chair Fabric",
+                new Color(0.035f, 0.045f, 0.055f),
+                0.0f,
+                0.34f,
                 fabricTexture,
-                new Vector2(4f, 4f));
+                new Vector2(7f, 7f));
             glassMaterial = CreateMaterial(
                 "Smoked Glass",
                 new Color(0.16f, 0.38f, 0.42f, 0.32f),
@@ -151,18 +188,18 @@ namespace MetaverseGame.Bootstrap
                 0.96f,
                 transparent: true);
             rugMaterial = CreateMaterial(
-                "Boardroom Rug",
-                new Color(0.10f, 0.16f, 0.17f),
+                "Carpet Accent",
+                new Color(0.68f, 0.72f, 0.74f),
                 0.01f,
-                0.24f,
+                0.2f,
                 fabricTexture,
-                new Vector2(9f, 7f));
+                new Vector2(9f, 11f));
             warmLightMaterial = CreateMaterial(
-                "Warm Architectural Light",
-                new Color(0.45f, 0.25f, 0.08f),
+                "Ceiling Light Emission",
+                new Color(0.92f, 0.9f, 0.78f),
                 0.05f,
                 0.8f,
-                emission: new Color(2.4f, 1.15f, 0.32f));
+                emission: new Color(1.8f, 1.65f, 1.2f));
             cyanLightMaterial = CreateMaterial(
                 "Cyan Status Light",
                 new Color(0.05f, 0.32f, 0.36f),
@@ -222,25 +259,25 @@ namespace MetaverseGame.Bootstrap
         {
             RenderSettings.skybox = null;
             RenderSettings.ambientMode = AmbientMode.Trilight;
-            RenderSettings.ambientSkyColor = new Color(0.34f, 0.38f, 0.40f);
-            RenderSettings.ambientEquatorColor = new Color(0.20f, 0.19f, 0.17f);
-            RenderSettings.ambientGroundColor = new Color(0.075f, 0.08f, 0.075f);
-            RenderSettings.ambientIntensity = 0.9f;
+            RenderSettings.ambientSkyColor = new Color(0.72f, 0.78f, 0.82f);
+            RenderSettings.ambientEquatorColor = new Color(0.58f, 0.61f, 0.60f);
+            RenderSettings.ambientGroundColor = new Color(0.34f, 0.36f, 0.35f);
+            RenderSettings.ambientIntensity = 1.15f;
 
             Camera camera = Camera.main;
             if (camera != null)
             {
                 camera.clearFlags = CameraClearFlags.SolidColor;
-                camera.backgroundColor = new Color(0.035f, 0.055f, 0.06f);
-                camera.fieldOfView = 52f;
+                camera.backgroundColor = new Color(0.68f, 0.75f, 0.78f);
+                camera.fieldOfView = 56f;
             }
 
             GameObject sunObject = GameObject.Find("Sun");
             Light sun = sunObject != null ? sunObject.GetComponent<Light>() : null;
             if (sun != null)
             {
-                sun.color = new Color(1f, 0.88f, 0.72f);
-                sun.intensity = 0.78f;
+                sun.color = new Color(1f, 0.96f, 0.88f);
+                sun.intensity = 0.92f;
                 sun.shadows = LightShadows.Soft;
                 sun.shadowStrength = 0.62f;
             }
@@ -251,10 +288,19 @@ namespace MetaverseGame.Bootstrap
             GameObject ground = ApplyMaterial("Low Poly Arena", stoneMaterial);
             if (ground != null)
             {
-                ground.transform.localScale = new Vector3(3.6f, 1f, 3.6f);
+                ground.transform.localScale = new Vector3(2.45f, 1f, 2.45f);
             }
 
-            ApplyMaterial("North Wall", wallMaterial);
+            GameObject northWall = ApplyMaterial("North Wall", acousticBlueMaterial);
+            // Keep the original collider as the room boundary, but let the
+            // authored front wall own the visible surface without overlap.
+            Renderer northWallRenderer = northWall != null
+                ? northWall.GetComponent<Renderer>()
+                : null;
+            if (northWallRenderer != null)
+            {
+                northWallRenderer.enabled = false;
+            }
             GameObject southWall = ApplyMaterial("South Wall", wallMaterial);
             Renderer southWallRenderer = southWall != null
                 ? southWall.GetComponent<Renderer>()
@@ -263,18 +309,36 @@ namespace MetaverseGame.Bootstrap
             {
                 southWallRenderer.enabled = false;
             }
-            ApplyMaterial("East Wall", wallMaterial);
-            ApplyMaterial("West Wall", wallMaterial);
+            ApplyMaterial("East Wall", slatMaterial);
+            GameObject westWall = ApplyMaterial("West Wall", wallMaterial);
+            Renderer westWallRenderer = westWall != null
+                ? westWall.GetComponent<Renderer>()
+                : null;
+            if (westWallRenderer != null)
+            {
+                westWallRenderer.enabled = false;
+            }
 
             GameObject dividerLeft = ApplyMaterial("Divider Left", glassMaterial);
             GameObject dividerRight = ApplyMaterial("Divider Right", glassMaterial);
-            if (dividerLeft != null)
+            foreach (GameObject divider in new[] { dividerLeft, dividerRight })
             {
-                dividerLeft.transform.localScale = new Vector3(11f, 3f, 0.12f);
-            }
-            if (dividerRight != null)
-            {
-                dividerRight.transform.localScale = new Vector3(11f, 3f, 0.12f);
+                if (divider == null)
+                {
+                    continue;
+                }
+
+                Renderer renderer = divider.GetComponent<Renderer>();
+                if (renderer != null)
+                {
+                    renderer.enabled = false;
+                }
+
+                Collider collider = divider.GetComponent<Collider>();
+                if (collider != null)
+                {
+                    collider.enabled = false;
+                }
             }
 
             ApplyMaterial("Network Door", walnutMaterial);
@@ -284,257 +348,233 @@ namespace MetaverseGame.Bootstrap
         {
             CreateBox(
                 "South Baseboard",
-                new Vector3(0f, 0.13f, -11.69f),
-                new Vector3(23.3f, 0.24f, 0.12f),
-                brassMaterial);
+                new Vector3(0f, 0.1f, -11.69f),
+                new Vector3(23.3f, 0.18f, 0.12f),
+                slatMaterial);
             CreateBox(
-                "North Baseboard",
-                new Vector3(0f, 0.13f, 11.69f),
-                new Vector3(23.3f, 0.24f, 0.12f),
-                brassMaterial);
-            CreateBox(
-                "West Baseboard",
-                new Vector3(-11.69f, 0.13f, 0f),
-                new Vector3(0.12f, 0.24f, 23.3f),
-                brassMaterial);
-            CreateBox(
-                "East Baseboard",
-                new Vector3(11.69f, 0.13f, 0f),
-                new Vector3(0.12f, 0.24f, 23.3f),
-                brassMaterial);
+                "North Blue Wall Base",
+                new Vector3(0f, 0.2f, 11.69f),
+                new Vector3(23.3f, 0.4f, 0.14f),
+                acousticBlueMaterial);
 
+            // Left-side window bays are intentionally open, like the reference room.
             CreateBox(
-                "Glass Frame Top",
-                new Vector3(0f, 2.9f, 2f),
-                new Vector3(23.5f, 0.16f, 0.18f),
-                metalMaterial);
+                "Window Header",
+                new Vector3(-11.72f, 2.88f, 0f),
+                new Vector3(0.16f, 0.18f, 23.3f),
+                ceilingMaterial);
             CreateBox(
-                "Glass Frame Bottom",
-                new Vector3(0f, 0.1f, 2f),
-                new Vector3(23.5f, 0.16f, 0.18f),
-                metalMaterial);
-            foreach (float x in new[] { -11.65f, -6.5f, -1.08f, 1.08f, 6.5f, 11.65f })
+                "Window Sill",
+                new Vector3(-11.72f, 0.18f, 0f),
+                new Vector3(0.16f, 0.18f, 23.3f),
+                wallMaterial);
+            foreach (float z in new[] { -9.6f, -5.1f, -0.6f, 3.9f, 8.4f })
             {
                 CreateBox(
-                    "Glass Frame Post",
-                    new Vector3(x, 1.5f, 2f),
-                    new Vector3(0.12f, 2.85f, 0.18f),
+                    "Window Mullion",
+                    new Vector3(-11.7f, 1.52f, z),
+                    new Vector3(0.18f, 2.7f, 0.12f),
                     metalMaterial);
-            }
-
-            CreateBox(
-                "South Cutaway Wall",
-                new Vector3(0f, 0.31f, -11.67f),
-                new Vector3(23.3f, 0.5f, 0.12f),
-                walnutMaterial);
-            for (int index = 0; index < 21; index++)
-            {
-                float x = -9f + index * 0.9f;
                 CreateBox(
-                    "North Walnut Wall Slat",
-                    new Vector3(x, 1.5f, 11.60f),
-                    new Vector3(0.08f, 2.48f, 0.08f),
-                    index % 5 == 0 ? brassMaterial : metalMaterial);
+                    "Window Glass",
+                    new Vector3(-11.62f, 1.52f, z + 2.05f),
+                    new Vector3(0.04f, 2.52f, 4.0f),
+                    windowGlassMaterial);
             }
 
             CreateBox(
-                "West Acoustic Panel",
-                new Vector3(-11.66f, 1.5f, -4.6f),
-                new Vector3(0.08f, 2.5f, 8.2f),
-                walnutMaterial);
+                "North Cobalt Acoustic Wall",
+                new Vector3(0f, 1.52f, 11.66f),
+                new Vector3(23.25f, 2.66f, 0.12f),
+                acousticBlueMaterial);
+            for (int index = 0; index < AcousticSlatCount; index++)
+            {
+                float x = -10.9f + index * 0.64f;
+                CreateBox(
+                    "East Acoustic Wall Slat",
+                    new Vector3(11.62f, 1.5f, x),
+                    new Vector3(0.12f, 2.55f, 0.085f),
+                    slatMaterial);
+            }
+
             CreateBox(
-                "East Acoustic Panel",
-                new Vector3(11.66f, 1.5f, -4.6f),
-                new Vector3(0.08f, 2.5f, 8.2f),
+                "North Display Lower Wood Band",
+                new Vector3(0f, 0.62f, 11.54f),
+                new Vector3(6.4f, 0.72f, 0.12f),
                 walnutMaterial);
 
             CreateBox(
                 "Strategy Display Frame",
-                new Vector3(6.05f, 1.56f, 1.78f),
-                new Vector3(6.45f, 2.16f, 0.12f),
+                new Vector3(0f, 1.5f, 11.48f),
+                new Vector3(5.35f, 3f, 0.15f),
                 metalMaterial);
             CreateBox(
                 "Strategy Display",
-                new Vector3(6.05f, 1.56f, 1.69f),
-                new Vector3(6.05f, 1.78f, 0.045f),
+                new Vector3(0f, 1.5f, 11.38f),
+                new Vector3(StrategyDisplayWidth, StrategyDisplayHeight, 0.045f),
                 displayMaterial);
             CreateBox(
                 "Display Camera Bar",
-                new Vector3(6.05f, 2.61f, 1.62f),
+                new Vector3(0f, 2.78f, 11.3f),
                 new Vector3(1.1f, 0.09f, 0.09f),
                 metalMaterial);
             CreateSphere(
                 "Display Camera Lens",
-                new Vector3(6.05f, 2.61f, 1.55f),
+                new Vector3(0f, 2.78f, 11.23f),
                 new Vector3(0.08f, 0.08f, 0.05f),
                 cyanLightMaterial);
+
+            CreateCeilingGrid();
         }
 
         private void BuildConferenceArea()
         {
-            const float tableCenterZ = -4.5f;
+            const float tableWidth = 8.9f;
+            const float tableDepth = 1.25f;
+            float[] tableCenters = { -7.0f, -3.5f, 0f };
 
             CreateBox(
-                "Conference Rug",
-                new Vector3(0f, 0.035f, tableCenterZ),
-                new Vector3(9.2f, 0.055f, 10.2f),
+                "Conference Carpet Focus",
+                new Vector3(0f, 0.035f, -3.5f),
+                new Vector3(10.4f, 0.055f, 10.0f),
                 rugMaterial);
-            CreateBox(
-                "Table Brass Edge",
-                new Vector3(0f, 0.91f, tableCenterZ),
-                new Vector3(3.76f, 0.18f, 7.36f),
-                brassMaterial,
-                true);
-            CreateBox(
-                "Walnut Conference Table",
-                new Vector3(0f, 0.98f, tableCenterZ),
-                new Vector3(3.56f, 0.18f, 7.16f),
-                walnutMaterial,
-                true);
-            CreateBox(
-                "Table Center Inlay",
-                new Vector3(0f, 1.08f, tableCenterZ),
-                new Vector3(0.28f, 0.025f, 5.9f),
-                metalMaterial);
 
-            foreach (float z in new[] { -6.45f, -2.55f })
+            for (int row = 0; row < tableCenters.Length; row++)
             {
-                CreateBox(
-                    "Table Pedestal",
-                    new Vector3(0f, 0.47f, z),
-                    new Vector3(1.3f, 0.78f, 0.9f),
-                    metalMaterial);
-            }
+                float z = tableCenters[row];
+                string rowName = $"Plato Table {row + 1}";
 
-            foreach (float z in new[] { -6.65f, -4.5f, -2.35f })
-            {
                 CreateBox(
-                    "Conference Control",
-                    new Vector3(0f, 1.105f, z),
-                    new Vector3(0.66f, 0.06f, 0.36f),
+                    $"{rowName} Edge",
+                    new Vector3(0f, 0.83f, z),
+                    new Vector3(tableWidth + 0.16f, 0.16f, tableDepth + 0.16f),
+                    metalMaterial,
+                    true);
+                CreateBox(
+                    $"{rowName} Honey Oak Top",
+                    new Vector3(0f, 0.94f, z),
+                    new Vector3(tableWidth, 0.16f, tableDepth),
+                    walnutMaterial,
+                    true);
+                CreateBox(
+                    $"{rowName} Modesty Panel",
+                    new Vector3(0f, 0.48f, z),
+                    new Vector3(tableWidth - 0.32f, 0.62f, 0.09f),
+                    metalMaterial,
+                    true);
+                foreach (float x in new[] { -3.72f, 3.72f })
+                {
+                    CreateBox(
+                        $"{rowName} Leg",
+                        new Vector3(x, 0.42f, z),
+                        new Vector3(0.14f, 0.72f, 0.84f),
+                        metalMaterial,
+                        true);
+                }
+
+                CreateBox(
+                    $"{rowName} Center Control",
+                    new Vector3(0f, 1.045f, z),
+                    new Vector3(0.52f, 0.045f, 0.22f),
                     cyanLightMaterial);
-            }
 
-            foreach (float z in new[] { -7.2f, -5.4f, -3.6f, -1.8f })
-            {
-                CreateChair(new Vector3(-2.72f, 0f, z), 90f);
-                CreateChair(new Vector3(2.72f, 0f, z), -90f);
+                for (int seat = 0; seat < SeatsPerTableSide; seat++)
+                {
+                    float x = -3.3f + seat * 2.2f;
+                    CreateChair(new Vector3(x, 0f, z - 1.32f), 0f);
+                    CreateChair(new Vector3(x, 0f, z + 1.32f), 180f);
+                }
             }
-            CreateChair(new Vector3(0f, 0f, -9.25f), 0f);
-            CreateChair(new Vector3(0f, 0f, 0.25f), 180f);
 
             CreateBox(
-                "West Credenza",
-                new Vector3(-10.55f, 0.55f, -5.2f),
-                new Vector3(1.25f, 1.02f, 5.2f),
-                walnutMaterial,
+                "Presenter Podium",
+                new Vector3(-8.9f, 0.58f, 8.85f),
+                new Vector3(1.15f, 1.05f, 0.78f),
+                slatMaterial,
                 true);
             CreateBox(
-                "West Credenza Top",
-                new Vector3(-10.55f, 1.09f, -5.2f),
-                new Vector3(1.34f, 0.08f, 5.3f),
-                brassMaterial);
-            for (int index = 0; index < 4; index++)
-            {
-                CreateBox(
-                    "Credenza Door",
-                    new Vector3(-9.90f, 0.55f, -7.05f + index * 1.23f),
-                    new Vector3(0.035f, 0.74f, 1.08f),
-                    metalMaterial);
-            }
-
-            CreatePlant(new Vector3(-9.6f, 0f, -9.8f), 1.05f);
-            CreatePlant(new Vector3(9.6f, 0f, -9.8f), 1.05f);
+                "Presenter Podium Top",
+                new Vector3(-8.9f, 1.14f, 8.85f),
+                new Vector3(1.3f, 0.08f, 0.9f),
+                walnutMaterial);
+            CreateBox(
+                "Presenter Podium Light",
+                new Vector3(-8.9f, 0.76f, 8.42f),
+                new Vector3(0.72f, 0.05f, 0.035f),
+                cyanLightMaterial);
         }
 
         private void BuildArrivalLounge()
         {
             CreateBox(
-                "Arrival Runner",
-                new Vector3(0f, 0.035f, 7.1f),
-                new Vector3(7.2f, 0.05f, 7.4f),
+                "Rear Entry Carpet",
+                new Vector3(0f, 0.035f, 8.8f),
+                new Vector3(10.7f, 0.05f, 5.4f),
                 rugMaterial);
-
-            CreateLoungeSeat(new Vector3(-5.4f, 0f, 7.2f), 90f);
-            CreateLoungeSeat(new Vector3(5.4f, 0f, 7.2f), -90f);
-
-            CreateCylinder(
-                "Arrival Medallion Rim",
-                new Vector3(0f, 0.045f, 7.1f),
-                new Vector3(1.75f, 0.035f, 1.75f),
-                brassMaterial);
-            CreateCylinder(
-                "Arrival Medallion",
-                new Vector3(0f, 0.075f, 7.1f),
-                new Vector3(1.48f, 0.025f, 1.48f),
-                stoneMaterial);
             CreateBox(
-                "Medallion Mark Horizontal",
-                new Vector3(0f, 0.11f, 7.1f),
-                new Vector3(1.35f, 0.025f, 0.14f),
-                cyanLightMaterial);
-            CreateBox(
-                "Medallion Mark Vertical",
-                new Vector3(0f, 0.11f, 7.1f),
-                new Vector3(0.14f, 0.025f, 1.35f),
-                cyanLightMaterial);
-
-            CreateBox(
-                "North Console",
-                new Vector3(0f, 0.62f, 10.75f),
-                new Vector3(6.6f, 1.1f, 0.75f),
-                walnutMaterial,
+                "Rear Sideboard",
+                new Vector3(8.8f, 0.52f, 9.45f),
+                new Vector3(1.35f, 0.92f, 2.3f),
+                slatMaterial,
                 true);
             CreateBox(
-                "North Console Top",
-                new Vector3(0f, 1.2f, 10.75f),
-                new Vector3(6.8f, 0.08f, 0.88f),
-                brassMaterial);
-            CreateBox(
-                "North Console Light",
-                new Vector3(0f, 0.67f, 10.34f),
-                new Vector3(4.8f, 0.08f, 0.035f),
-                warmLightMaterial);
-
-            CreatePlant(new Vector3(-9.5f, 0f, 9.7f), 0.92f);
-            CreatePlant(new Vector3(9.5f, 0f, 9.7f), 0.92f);
+                "Rear Sideboard Top",
+                new Vector3(8.8f, 1.03f, 9.45f),
+                new Vector3(1.45f, 0.08f, 2.4f),
+                walnutMaterial);
+            CreatePlant(new Vector3(-10.0f, 0f, 9.6f), 0.85f);
+            CreatePlant(new Vector3(10.0f, 0f, 9.6f), 0.85f);
         }
 
         private void BuildLightFixtures()
         {
-            foreach (float x in new[] { -1.1f, 1.1f })
+            foreach (float z in new[] { -7.0f, -3.5f, 0f })
             {
                 CreateBox(
-                    "Linear Pendant",
-                    new Vector3(x, 2.82f, -4.5f),
-                    new Vector3(0.09f, 0.055f, 5.9f),
+                    "Linear Ceiling Light",
+                    new Vector3(0f, 2.88f, z),
+                    new Vector3(7.2f, 0.055f, 0.12f),
                     warmLightMaterial);
-                CreateCylinder(
-                    "Pendant Mount South",
-                    new Vector3(x, 2.9f, -6.9f),
-                    new Vector3(0.055f, 0.08f, 0.055f),
-                    metalMaterial);
-                CreateCylinder(
-                    "Pendant Mount North",
-                    new Vector3(x, 2.9f, -2.1f),
-                    new Vector3(0.055f, 0.08f, 0.055f),
-                    metalMaterial);
             }
 
             CreateBox(
                 "Display Wash Light",
-                new Vector3(6.05f, 2.76f, 1.58f),
-                new Vector3(5.8f, 0.045f, 0.05f),
+                new Vector3(0f, 2.72f, 10.9f),
+                new Vector3(7.2f, 0.045f, 0.05f),
                 warmLightMaterial);
             CreateBox(
-                "Arrival Pendant",
-                new Vector3(0f, 2.82f, 7.1f),
-                new Vector3(4.5f, 0.055f, 0.09f),
+                "Rear Ceiling Light",
+                new Vector3(0f, 2.88f, 7.8f),
+                new Vector3(7.2f, 0.055f, 0.12f),
                 warmLightMaterial);
 
-            CreatePointLight("Table Light South", new Vector3(0f, 2.6f, -6.3f), 7.2f, 2.2f);
-            CreatePointLight("Table Light North", new Vector3(0f, 2.6f, -2.7f), 7.2f, 2.2f);
-            CreatePointLight("Arrival Light", new Vector3(0f, 2.6f, 7.1f), 7.5f, 1.8f);
+            CreatePointLight("Table Light South", new Vector3(0f, 2.6f, -7.0f), 6.5f, 1.6f);
+            CreatePointLight("Table Light Center", new Vector3(0f, 2.6f, -3.5f), 6.5f, 1.6f);
+            CreatePointLight("Table Light North", new Vector3(0f, 2.6f, 0f), 6.5f, 1.6f);
+            CreatePointLight("Rear Light", new Vector3(0f, 2.6f, 7.8f), 6.5f, 1.4f);
+        }
+
+        private void CreateCeilingGrid()
+        {
+            for (int index = 0; index < 8; index++)
+            {
+                float z = -10.5f + index * 3f;
+                CreateBox(
+                    "Ceiling Tile Crossbar",
+                    new Vector3(0f, 2.98f, z),
+                    new Vector3(23.3f, 0.06f, 0.06f),
+                    ceilingMaterial);
+            }
+
+            for (int index = 0; index < 6; index++)
+            {
+                float x = -9f + index * 3.6f;
+                CreateBox(
+                    "Ceiling Tile Rail",
+                    new Vector3(x, 2.98f, 0f),
+                    new Vector3(0.06f, 0.06f, 23.3f),
+                    ceilingMaterial);
+            }
         }
 
         private void CreateChair(Vector3 position, float yaw)
@@ -662,7 +702,7 @@ namespace MetaverseGame.Bootstrap
             lightObject.transform.localPosition = position;
             Light light = lightObject.AddComponent<Light>();
             light.type = LightType.Point;
-            light.color = new Color(1f, 0.75f, 0.46f);
+            light.color = new Color(1f, 0.91f, 0.78f);
             light.range = range;
             light.intensity = intensity;
             light.shadows = LightShadows.None;
@@ -896,27 +936,19 @@ namespace MetaverseGame.Bootstrap
         private Texture2D CreateStoneTexture()
         {
             const int size = 128;
-            Texture2D texture = CreateTexture("Graphite Stone Texture", size, size, true);
+            Texture2D texture = CreateTexture("Pale Carpet Texture", size, size, true);
             Color[] pixels = new Color[size * size];
-            Color dark = new(0.095f, 0.11f, 0.115f);
-            Color light = new(0.20f, 0.22f, 0.22f);
-            Color grout = new(0.035f, 0.04f, 0.042f);
+            Color low = new(0.56f, 0.59f, 0.60f);
+            Color high = new(0.76f, 0.78f, 0.78f);
 
             for (int y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++)
                 {
-                    bool onGrout = x % 32 < 2 || y % 32 < 2;
-                    float noise = Mathf.PerlinNoise(x * 0.075f, y * 0.075f);
-                    float vein = Mathf.Abs(Mathf.Sin(x * 0.14f + y * 0.055f + noise * 4.2f));
-                    Color color = onGrout
-                        ? grout
-                        : Color.Lerp(dark, light, noise * 0.72f);
-                    if (!onGrout && vein > 0.965f)
-                    {
-                        color = Color.Lerp(color, new Color(0.34f, 0.35f, 0.34f), 0.42f);
-                    }
-                    pixels[y * size + x] = color;
+                    float weave = Mathf.PerlinNoise(x * 0.09f, y * 0.19f);
+                    float heather = Mathf.Sin(y * 0.17f + weave * 2.2f) * 0.05f;
+                    float value = Mathf.Clamp01(weave * 0.62f + 0.24f + heather);
+                    pixels[y * size + x] = Color.Lerp(low, high, value);
                 }
             }
 
@@ -928,22 +960,22 @@ namespace MetaverseGame.Bootstrap
         private Texture2D CreateWoodTexture()
         {
             const int size = 128;
-            Texture2D texture = CreateTexture("Smoked Walnut Texture", size, size, true);
+            Texture2D texture = CreateTexture("Light Honey Oak Texture", size, size, true);
             Color[] pixels = new Color[size * size];
-            Color dark = new(0.12f, 0.045f, 0.018f);
-            Color light = new(0.45f, 0.20f, 0.075f);
+            Color dark = new(0.30f, 0.14f, 0.045f);
+            Color light = new(0.78f, 0.48f, 0.18f);
 
             for (int y = 0; y < size; y++)
             {
                 for (int x = 0; x < size; x++)
                 {
-                    float warp = Mathf.PerlinNoise(x * 0.025f, y * 0.095f) * 11f;
-                    float grain = (Mathf.Sin((x + warp) * 0.28f) + 1f) * 0.5f;
+                    float warp = Mathf.PerlinNoise(x * 0.035f, y * 0.08f) * 10f;
+                    float grain = (Mathf.Sin((y + warp) * 0.28f) + 1f) * 0.5f;
                     float variation = Mathf.PerlinNoise(x * 0.055f, y * 0.035f);
                     pixels[y * size + x] = Color.Lerp(
                         dark,
                         light,
-                        grain * 0.45f + variation * 0.38f);
+                        grain * 0.38f + variation * 0.42f + 0.08f);
                 }
             }
 

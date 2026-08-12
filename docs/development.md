@@ -34,12 +34,15 @@ committed scene starts a local host by default and contains:
   role state;
 - an immediate live-status HUD with a private role badge, local-player marker,
   and a compact session status;
-- a mobile-friendly executive boardroom with procedural stone, walnut, glass,
-  leather, metal, and display materials, collision-aware furniture, and warm
-  architectural lighting;
-- authored graphite stone, smoked walnut, and abstract strategy-display
-  textures under `Assets/MetaverseGame/Resources/Boardroom/`, with procedural
-  fallbacks and mobile platform import limits;
+- a mobile-friendly Plato conference room with three rows of light honey-oak
+  tables, black mesh chairs, cool gray carpet, window bays, acoustic slats,
+  cobalt presentation wall, collision-aware furniture, and warm architectural
+  lighting;
+- authored carpet, light-oak, and unbranded abstract strategy-display textures
+  under `Assets/MetaverseGame/Resources/Boardroom/`, with matching procedural
+  fallbacks and mobile platform import limits. The stable texture filenames
+  retain compatibility names from the earlier boardroom slice; see
+  [boardroom assets](boardroom-assets.md) for current hashes and provenance;
 - a landscape-only, safe-area-aware mobile control layer with a left virtual
   floating joystick capture zone and right context-action button;
 - a server-spawned network player prefab;
