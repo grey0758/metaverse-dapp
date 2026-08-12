@@ -19,6 +19,7 @@ coverage/
 [Ll]ibrary/
 [Tt]emp/
 [Oo]bj/
+.utmp/
 [Ll]ogs/
 [Uu]ser[Ss]ettings/
 [Mm]emoryCaptures/
