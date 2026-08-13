@@ -45,8 +45,8 @@ namespace MetaverseGame.Editor
             GameObject camera = new("Main Camera");
             camera.tag = "MainCamera";
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 2.8f, -14.5f),
-                Quaternion.Euler(10f, 0f, 0f));
+                new Vector3(0f, 2.7f, -13.8f),
+                Quaternion.Euler(12f, 0f, 0f));
             Camera sceneCamera = camera.AddComponent<Camera>();
             sceneCamera.clearFlags = CameraClearFlags.SolidColor;
             sceneCamera.backgroundColor = new Color(0.035f, 0.055f, 0.06f);
@@ -65,19 +65,20 @@ namespace MetaverseGame.Editor
 
             GameObject ground = GameObject.CreatePrimitive(PrimitiveType.Plane);
             ground.name = "Low Poly Arena";
-            ground.transform.localScale = new Vector3(2.4f, 1f, 2.4f);
+            ground.transform.localScale = new Vector3(1.52f, 1f, 2.4f);
 
-            CreateBlock("North Wall", new Vector3(0f, 1.5f, 12f), new Vector3(24f, 3f, 0.5f));
-            CreateBlock("South Wall", new Vector3(0f, 1.5f, -12f), new Vector3(24f, 3f, 0.5f));
-            CreateBlock("East Wall", new Vector3(12f, 1.5f, 0f), new Vector3(0.5f, 3f, 24f));
-            CreateBlock("West Wall", new Vector3(-12f, 1.5f, 0f), new Vector3(0.5f, 3f, 24f));
-            CreateBlock("Divider Left", new Vector3(-6.5f, 1.5f, 2f), new Vector3(11f, 3f, 0.5f));
-            CreateBlock("Divider Right", new Vector3(6.5f, 1.5f, 2f), new Vector3(11f, 3f, 0.5f));
+            CreateBlock("North Wall", new Vector3(0f, 2f, 12f), new Vector3(15.2f, 4f, 0.5f));
+            CreateBlock("South Wall", new Vector3(0f, 2f, -12f), new Vector3(15.2f, 4f, 0.5f));
+            CreateBlock("East Wall", new Vector3(7.6f, 2f, -1.55f), new Vector3(0.5f, 4f, 20.9f));
+            CreateBlock("West Wall", new Vector3(-7.6f, 2f, 0f), new Vector3(0.5f, 4f, 24f));
+            CreateBlock("Divider Left", new Vector3(-4.3f, 2f, 2f), new Vector3(6.6f, 4f, 0.5f));
+            CreateBlock("Divider Right", new Vector3(4.3f, 2f, 2f), new Vector3(6.6f, 4f, 0.5f));
 
             GameObject door = CreateBlock(
                 "Network Door",
-                new Vector3(0f, 1.5f, 2f),
-                new Vector3(2f, 3f, 0.35f));
+                new Vector3(7.42f, 1.5f, 9.85f),
+                new Vector3(1.8f, 3f, 0.24f));
+            door.transform.rotation = Quaternion.Euler(0f, 90f, 0f);
             door.AddComponent<NetworkObject>();
             door.AddComponent<NetworkDoor>();
 

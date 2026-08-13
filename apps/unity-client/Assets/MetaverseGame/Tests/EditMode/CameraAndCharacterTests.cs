@@ -44,6 +44,28 @@ namespace MetaverseGame.Tests
         }
 
         [Test]
+        public void FreeViewAcceptsDragWhileLockedViewIgnoresIt()
+        {
+            GameObject cameraObject = new("Camera");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            FollowLocalPlayer controller = cameraObject.AddComponent<FollowLocalPlayer>();
+            try
+            {
+                float lockedPitch = controller.CurrentPitch;
+                controller.ApplyLookDelta(new Vector2(80f, 40f));
+                Assert.That(controller.CurrentPitch, Is.EqualTo(lockedPitch));
+
+                controller.SetViewMode(FollowLocalPlayer.ViewMode.Free);
+                controller.ApplyLookDelta(new Vector2(80f, 40f));
+                Assert.That(controller.CurrentPitch, Is.LessThan(lockedPitch));
+            }
+            finally
+            {
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
         public void LookSurfaceOwnsOnlyOnePointer()
         {
             GameObject cameraObject = new("Camera");
@@ -73,6 +95,55 @@ namespace MetaverseGame.Tests
                 Object.DestroyImmediate(surfaceObject);
                 Object.DestroyImmediate(cameraObject);
             }
+        }
+
+        [Test]
+        public void CommunityCharacterResourceIncludesIdleAndWalkAnimations()
+        {
+            const string resourcePath = "Characters/character-j";
+            GameObject character = Resources.Load<GameObject>(resourcePath);
+            AnimationClip[] clips = Resources.LoadAll<AnimationClip>(resourcePath);
+
+            Assert.That(character, Is.Not.Null, "The community character must ship in Resources.");
+            Assert.That(clips, Is.Not.Empty, "The community character must include animation clips.");
+            Assert.That(ContainsClip(clips, "idle"), Is.True, "The idle clip is missing.");
+            Assert.That(ContainsClip(clips, "walk"), Is.True, "The walk clip is missing.");
+        }
+
+        [Test]
+        public void PlayerVisualInstantiatesTheCommunityCharacterAndAnimations()
+        {
+            GameObject player = new("Player Visual Test");
+            try
+            {
+                NetworkPlayerVisual visual = player.AddComponent<NetworkPlayerVisual>();
+
+                Assert.That(visual.UsesCommunityModel, Is.True);
+                Assert.That(visual.HasCommunityAnimation, Is.True);
+                Assert.That(visual.VisualRoot, Is.Not.Null);
+                Assert.That(
+                    visual.VisualRoot.Find("Kenney Blocky Character J"),
+                    Is.Not.Null);
+            }
+            finally
+            {
+                Object.DestroyImmediate(player);
+            }
+        }
+
+        private static bool ContainsClip(AnimationClip[] clips, string expectedName)
+        {
+            foreach (AnimationClip clip in clips)
+            {
+                if (clip != null && string.Equals(
+                        clip.name,
+                        expectedName,
+                        System.StringComparison.OrdinalIgnoreCase))
+                {
+                    return true;
+                }
+            }
+            return false;
         }
     }
 }

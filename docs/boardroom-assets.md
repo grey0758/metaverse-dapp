@@ -35,18 +35,20 @@ Current runtime SHA-256 values:
 | Asset | SHA-256 |
 |---|---|
 | `GraphiteStone.png` | `44d22f6b887fe76966238bef06c8a0d676a29214be70bfab08b4d4078daf6ce4` |
-| `SmokedWalnut.png` | `c49f9c2d74473fdf04e7c8f559f6223a3002ebe570aaafbd20a81fab35e33046` |
-| `StrategyDisplay.png` | `c18ffd20b6c90e7a3afc0a24258264c0c48bdee90667e6b6cd760c930cdf7ea8` |
+| `SmokedWalnut.png` | `a9e8cf255ee82fc0f0d173cffd504610c460a7be463e5df05fc97af27320ac87` |
+| `StrategyDisplay.png` | `c5056448af3ee2312449013fecd68d5201389cde3bbf3c198ae7882dd3488e6b` |
 
 ## Generation Record
 
 ## Current Visual Calibration
 
 The scene now uses a lower shoulder-height third-person framing with a 60
-degree field of view. The front display frame is widened to match the broad
-screen proportion in the reference photographs, while the visible room keeps
-the cobalt acoustic wall, left window bays, right oak slat wall, three table
-rows, and linear ceiling fixtures as the primary landmarks.
+degree field of view. Its authored shell is calibrated to a narrow 15.2 by 24
+meter room instead of the earlier square prototype. The front display frame is
+widened to match the broad screen proportion in the reference photographs,
+while the room keeps the cobalt acoustic wall, five left window bays, right oak
+slat wall and door opening, three forward-facing table rows with seven seats
+each, modular ceiling, and recessed light panels as the primary landmarks.
 
 - Provider endpoint authorized for the attempt: `https://video.opencodex.uk/v1`.
 - Requested models: `gpt-image-2` for 1K work and `gpt-image-2-4k` for large
@@ -55,10 +57,13 @@ rows, and linear ceiling fixtures as the primary landmarks.
 - Result: the provider was under excessive load; the 1K smoke request failed,
   the 4K request returned a bad-request response, and an edit request timed
   out. No provider source is claimed as a successful input for this revision.
-- Selected runtime set: locally derived, reviewed safe fallback carpet and
-  oak material maps, plus the previously reviewed unbranded abstract display
-  bitmap. The ignored source photographs and generation scratch files are not
-  product assets.
+- Selected runtime set: the reviewed carpet is unchanged. The existing safe
+  wood map was deterministically color-calibrated to the reference room's
+  light honey-oak tables, and the existing unbranded abstract display was
+  deterministically calibrated to a brighter cobalt screen. The 2 x 2 oak
+  tiling review showed no new edge seam. No generated provider output is used.
+  The ignored source photographs and calibration scratch files are not product
+  assets.
 
 The material prompt intent was to preserve the room's pale gray woven carpet,
 light honey-oak grain, and restrained corporate display composition while

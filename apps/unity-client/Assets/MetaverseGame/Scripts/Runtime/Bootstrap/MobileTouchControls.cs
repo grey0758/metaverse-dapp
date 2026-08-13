@@ -241,7 +241,7 @@ namespace MetaverseGame.Bootstrap
                 "Camera View Selector",
                 safeAreaRoot);
             RectTransform panelRect = panelObject.GetComponent<RectTransform>();
-            AnchorAt(panelRect, new Vector2(1f, 1f), new Vector2(-152f, -126f));
+            AnchorAt(panelRect, new Vector2(1f, 1f), new Vector2(-152f, -202f));
             panelRect.sizeDelta = new Vector2(286f, 66f);
 
             Image panelImage = panelObject.AddComponent<Image>();

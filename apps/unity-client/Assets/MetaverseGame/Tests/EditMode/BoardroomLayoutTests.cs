@@ -11,10 +11,12 @@ namespace MetaverseGame.Tests
         public void PlatoRoomLayoutMatchesReferenceComposition()
         {
             Assert.That(BoardroomEnvironment.ConferenceTableCount, Is.EqualTo(3));
-            Assert.That(BoardroomEnvironment.SeatsPerTableSide, Is.EqualTo(4));
+            Assert.That(BoardroomEnvironment.SeatsPerTableSide, Is.EqualTo(7));
             Assert.That(BoardroomEnvironment.WindowBayCount, Is.EqualTo(5));
-            Assert.That(BoardroomEnvironment.AcousticSlatCount, Is.EqualTo(35));
-            Assert.That(BoardroomEnvironment.RoomHalfExtent, Is.EqualTo(12f));
+            Assert.That(BoardroomEnvironment.AcousticSlatCount, Is.EqualTo(72));
+            Assert.That(BoardroomEnvironment.RoomHalfWidth, Is.EqualTo(7.6f));
+            Assert.That(BoardroomEnvironment.RoomHalfLength, Is.EqualTo(12f));
+            Assert.That(BoardroomEnvironment.RoomCeilingHeight, Is.EqualTo(4f));
             Assert.That(
                 BoardroomEnvironment.StrategyDisplayWidth /
                     BoardroomEnvironment.StrategyDisplayHeight,
@@ -33,7 +35,9 @@ namespace MetaverseGame.Tests
                     position.z <= -8.55f ||
                     position.z >= 2.5f;
                 Assert.That(outsideConferenceFurniture, Is.True);
-                Assert.That(Mathf.Abs(position.x), Is.LessThan(11f));
+                Assert.That(
+                    Mathf.Abs(position.x),
+                    Is.LessThan(BoardroomEnvironment.RoomHalfWidth - 0.5f));
                 Assert.That(position.z, Is.InRange(-11f, 11f));
                 Assert.That(position.y, Is.EqualTo(1f));
             }

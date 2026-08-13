@@ -13,14 +13,24 @@ namespace MetaverseGame.Gameplay
     {
         private const string CharacterResource = "Characters/character-j";
         private const float CharacterHeight = 2f;
+        private const float MovementThreshold = 0.08f;
 
         [SerializeField] private float modelScale = 1f;
         [SerializeField] private Color fallbackColor = new(0.10f, 0.62f, 0.72f);
+        [SerializeField] private bool showGroundMarker = true;
 
         private GameObject visualRoot;
         private Material fallbackMaterial;
+        private Material markerMaterial;
+        private Animation legacyAnimation;
+        private Animator animator;
+        private AnimationClip idleClip;
+        private AnimationClip walkClip;
+        private string activeClip;
+        private Vector3 lastPosition;
 
         public bool UsesCommunityModel { get; private set; }
+        public bool HasCommunityAnimation => idleClip != null || walkClip != null;
         public Transform VisualRoot => visualRoot != null ? visualRoot.transform : null;
 
         private void Awake()
@@ -41,6 +51,17 @@ namespace MetaverseGame.Gameplay
                     DestroyImmediate(fallbackMaterial);
                 }
             }
+            if (markerMaterial != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(markerMaterial);
+                }
+                else
+                {
+                    DestroyImmediate(markerMaterial);
+                }
+            }
         }
 
         private void BuildVisual()
@@ -58,10 +79,165 @@ namespace MetaverseGame.Gameplay
                 instance.name = "Kenney Blocky Character J";
                 NormalizeImportedModel(instance);
                 UsesCommunityModel = true;
+                ConfigureAnimation(instance);
+            }
+            else
+            {
+                BuildFallbackVisual(visualRoot.transform);
+            }
+
+            if (showGroundMarker)
+            {
+                CreateGroundMarker();
+            }
+            lastPosition = transform.position;
+        }
+
+        private void Update()
+        {
+            if (!UsesCommunityModel || visualRoot == null)
+            {
                 return;
             }
 
-            BuildFallbackVisual(visualRoot.transform);
+            float frameSpeed = Time.deltaTime > 0.0001f
+                ? Vector3.Distance(transform.position, lastPosition) / Time.deltaTime
+                : 0f;
+            lastPosition = transform.position;
+
+            if (legacyAnimation != null)
+            {
+                PlayLegacyClip(frameSpeed > MovementThreshold ? walkClip : idleClip);
+            }
+            else if (animator != null && animator.runtimeAnimatorController != null)
+            {
+                string state = frameSpeed > MovementThreshold ? "walk" : "idle";
+                if (!string.Equals(activeClip, state, System.StringComparison.OrdinalIgnoreCase))
+                {
+                    animator.CrossFadeInFixedTime(state, 0.12f);
+                    activeClip = state;
+                }
+            }
+        }
+
+        private void ConfigureAnimation(GameObject instance)
+        {
+            legacyAnimation = instance.GetComponentInChildren<Animation>(true);
+            if (legacyAnimation != null)
+            {
+                legacyAnimation.playAutomatically = false;
+                idleClip = FindClip(legacyAnimation, "idle");
+                walkClip = FindClip(legacyAnimation, "walk");
+                if (idleClip == null)
+                {
+                    idleClip = FindFirstClip(legacyAnimation);
+                }
+                if (idleClip != null)
+                {
+                    idleClip.wrapMode = WrapMode.Loop;
+                }
+                if (walkClip != null)
+                {
+                    walkClip.wrapMode = WrapMode.Loop;
+                }
+                PlayLegacyClip(idleClip);
+                return;
+            }
+
+            animator = instance.GetComponentInChildren<Animator>(true);
+            if (animator != null)
+            {
+                animator.enabled = animator.runtimeAnimatorController != null;
+            }
+        }
+
+        private void PlayLegacyClip(AnimationClip clip)
+        {
+            if (legacyAnimation == null || clip == null ||
+                string.Equals(activeClip, clip.name, System.StringComparison.Ordinal))
+            {
+                return;
+            }
+
+            legacyAnimation.CrossFade(clip.name, 0.12f);
+            activeClip = clip.name;
+        }
+
+        private static AnimationClip FindClip(Animation animation, string token)
+        {
+            foreach (AnimationState state in animation)
+            {
+                AnimationClip clip = state?.clip;
+                if (clip != null && clip.name.IndexOf(
+                        token,
+                        System.StringComparison.OrdinalIgnoreCase) >= 0)
+                {
+                    return clip;
+                }
+            }
+            return null;
+        }
+
+        private static AnimationClip FindFirstClip(Animation animation)
+        {
+            foreach (AnimationState state in animation)
+            {
+                if (state?.clip != null)
+                {
+                    return state.clip;
+                }
+            }
+            return null;
+        }
+
+        private void CreateGroundMarker()
+        {
+            Shader shader = Shader.Find("Universal Render Pipeline/Lit")
+                ?? Shader.Find("Standard")
+                ?? Shader.Find("Diffuse");
+            markerMaterial = new Material(shader)
+            {
+                name = "Player Ground Marker",
+                hideFlags = HideFlags.DontSave,
+            };
+            Color markerColor = new(0.12f, 0.88f, 0.96f, 1f);
+            if (markerMaterial.HasProperty("_BaseColor"))
+            {
+                markerMaterial.SetColor("_BaseColor", markerColor);
+            }
+            if (markerMaterial.HasProperty("_Color"))
+            {
+                markerMaterial.SetColor("_Color", markerColor);
+            }
+            if (markerMaterial.HasProperty("_EmissionColor"))
+            {
+                markerMaterial.EnableKeyword("_EMISSION");
+                markerMaterial.SetColor("_EmissionColor", markerColor * 1.8f);
+            }
+
+            GameObject marker = GameObject.CreatePrimitive(PrimitiveType.Cylinder);
+            marker.name = "Community Character Ground Marker";
+            marker.transform.SetParent(transform, false);
+            marker.transform.localPosition = new Vector3(0f, -0.98f, 0f);
+            marker.transform.localScale = new Vector3(0.72f, 0.018f, 0.72f);
+            Renderer renderer = marker.GetComponent<Renderer>();
+            if (renderer != null)
+            {
+                renderer.sharedMaterial = markerMaterial;
+                renderer.shadowCastingMode = ShadowCastingMode.Off;
+            }
+            Collider collider = marker.GetComponent<Collider>();
+            if (collider != null)
+            {
+                if (Application.isPlaying)
+                {
+                    Destroy(collider);
+                }
+                else
+                {
+                    DestroyImmediate(collider);
+                }
+            }
         }
 
         private static void NormalizeImportedModel(GameObject instance)
