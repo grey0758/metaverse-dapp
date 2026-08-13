@@ -25,6 +25,12 @@ namespace MetaverseGame.Tests
                 BoardroomEnvironment.StrategyDisplayWidth /
                     BoardroomEnvironment.StrategyDisplayHeight,
                 Is.EqualTo(16f / 9f).Within(0.0001f));
+            Assert.That(
+                BoardroomEnvironment.StrategyDisplayTextureScale,
+                Is.EqualTo(new Vector2(-1f, -1f)));
+            Assert.That(
+                BoardroomEnvironment.StrategyDisplayTextureOffset,
+                Is.EqualTo(Vector2.one));
         }
 
         [Test]
@@ -58,7 +64,8 @@ namespace MetaverseGame.Tests
                 FollowLocalPlayer.DefaultDistance);
 
             Assert.That(spawn.x, Is.LessThan(-5.5f));
-            Assert.That(cameraPosition.x, Is.LessThan(spawn.x));
+            Assert.That(cameraPosition.x, Is.GreaterThan(spawn.x));
+            Assert.That(cameraPosition.x, Is.LessThan(-5f));
             Assert.That(
                 Mathf.Abs(cameraPosition.x),
                 Is.LessThan(BoardroomEnvironment.RoomHalfWidth - 0.5f));

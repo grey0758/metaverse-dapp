@@ -26,6 +26,8 @@ namespace MetaverseGame.Bootstrap
         public const float ConferenceChairWidth = 0.72f;
         public const float StrategyDisplayWidth = 6.2f;
         public const float StrategyDisplayHeight = StrategyDisplayWidth * 9f / 16f;
+        public static Vector2 StrategyDisplayTextureScale => new(-1f, -1f);
+        public static Vector2 StrategyDisplayTextureOffset => Vector2.one;
 
         private readonly List<Material> runtimeMaterials = new();
         private readonly List<Texture2D> runtimeTextures = new();
@@ -244,8 +246,9 @@ namespace MetaverseGame.Bootstrap
                 0f,
                 0.42f,
                 dashboardTexture,
-                Vector2.one,
-                Color.white);
+                StrategyDisplayTextureScale,
+                Color.white,
+                textureOffset: StrategyDisplayTextureOffset);
             ceramicMaterial = CreateMaterial(
                 "Charcoal Ceramic",
                 new Color(0.12f, 0.14f, 0.13f),
@@ -971,7 +974,8 @@ namespace MetaverseGame.Bootstrap
             Texture2D texture = null,
             Vector2? textureScale = null,
             Color? emission = null,
-            bool transparent = false)
+            bool transparent = false,
+            Vector2? textureOffset = null)
         {
             Material material = new(surfaceShader)
             {
@@ -991,8 +995,11 @@ namespace MetaverseGame.Bootstrap
                 SetTexture(material, "_MainTex", texture);
                 SetTexture(material, "_BaseMap", texture);
                 Vector2 scale = textureScale ?? Vector2.one;
+                Vector2 offset = textureOffset ?? Vector2.zero;
                 SetTextureScale(material, "_MainTex", scale);
                 SetTextureScale(material, "_BaseMap", scale);
+                SetTextureOffset(material, "_MainTex", offset);
+                SetTextureOffset(material, "_BaseMap", offset);
             }
 
             if (emission.HasValue)
@@ -1002,6 +1009,14 @@ namespace MetaverseGame.Bootstrap
                 if (texture != null)
                 {
                     SetTexture(material, "_EmissionMap", texture);
+                    SetTextureScale(
+                        material,
+                        "_EmissionMap",
+                        textureScale ?? Vector2.one);
+                    SetTextureOffset(
+                        material,
+                        "_EmissionMap",
+                        textureOffset ?? Vector2.zero);
                 }
             }
 
@@ -1423,6 +1438,14 @@ namespace MetaverseGame.Bootstrap
             if (material.HasProperty(property))
             {
                 material.SetTextureScale(property, value);
+            }
+        }
+
+        private static void SetTextureOffset(Material material, string property, Vector2 value)
+        {
+            if (material.HasProperty(property))
+            {
+                material.SetTextureOffset(property, value);
             }
         }
 

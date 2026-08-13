@@ -22,7 +22,7 @@ namespace MetaverseGame.Gameplay
         private const float PlayerEyeTargetHeight = 1.02f;
         public const float DefaultDistance = 5f;
         public const float DefaultPitch = 10f;
-        public const float DefaultLockedYawOffset = 8f;
+        public const float DefaultLockedYawOffset = -8f;
         private const float DefaultLookSensitivity = 0.16f;
         private const float DefaultMinDistance = 1.35f;
         private const float DefaultMaxDistance = 6.2f;
