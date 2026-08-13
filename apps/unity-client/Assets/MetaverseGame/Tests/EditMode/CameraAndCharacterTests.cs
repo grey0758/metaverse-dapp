@@ -117,13 +117,17 @@ namespace MetaverseGame.Tests
             try
             {
                 NetworkPlayerVisual visual = player.AddComponent<NetworkPlayerVisual>();
+                visual.EnsureInitialized();
 
                 Assert.That(visual.UsesCommunityModel, Is.True);
                 Assert.That(visual.HasCommunityAnimation, Is.True);
                 Assert.That(visual.VisualRoot, Is.Not.Null);
-                Assert.That(
-                    visual.VisualRoot.Find("Kenney Blocky Character J"),
-                    Is.Not.Null);
+                Transform model = visual.VisualRoot.Find("Kenney Blocky Character J");
+                Assert.That(model, Is.Not.Null);
+                Animation animation = model.GetComponentInChildren<Animation>(true);
+                Assert.That(animation, Is.Not.Null);
+                Assert.That(animation.GetClip("idle"), Is.Not.Null);
+                Assert.That(animation.GetClip("walk"), Is.Not.Null);
             }
             finally
             {

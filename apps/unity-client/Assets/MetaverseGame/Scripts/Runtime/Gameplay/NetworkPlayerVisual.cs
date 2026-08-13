@@ -30,12 +30,21 @@ namespace MetaverseGame.Gameplay
         private Vector3 lastPosition;
 
         public bool UsesCommunityModel { get; private set; }
-        public bool HasCommunityAnimation => idleClip != null || walkClip != null;
+        public bool HasCommunityAnimation =>
+            legacyAnimation != null && idleClip != null && walkClip != null;
         public Transform VisualRoot => visualRoot != null ? visualRoot.transform : null;
 
         private void Awake()
         {
-            BuildVisual();
+            EnsureInitialized();
+        }
+
+        public void EnsureInitialized()
+        {
+            if (visualRoot == null)
+            {
+                BuildVisual();
+            }
         }
 
         private void OnDestroy()
@@ -122,10 +131,23 @@ namespace MetaverseGame.Gameplay
 
         private void ConfigureAnimation(GameObject instance)
         {
+            AnimationClip[] resourceClips =
+                Resources.LoadAll<AnimationClip>(CharacterResource);
             legacyAnimation = instance.GetComponentInChildren<Animation>(true);
+            if (legacyAnimation == null && ContainsLegacyClip(resourceClips))
+            {
+                legacyAnimation = instance.AddComponent<Animation>();
+            }
             if (legacyAnimation != null)
             {
                 legacyAnimation.playAutomatically = false;
+                foreach (AnimationClip clip in resourceClips)
+                {
+                    if (clip != null && clip.legacy && legacyAnimation.GetClip(clip.name) == null)
+                    {
+                        legacyAnimation.AddClip(clip, clip.name);
+                    }
+                }
                 idleClip = FindClip(legacyAnimation, "idle");
                 walkClip = FindClip(legacyAnimation, "walk");
                 if (idleClip == null)
@@ -149,6 +171,18 @@ namespace MetaverseGame.Gameplay
             {
                 animator.enabled = animator.runtimeAnimatorController != null;
             }
+        }
+
+        private static bool ContainsLegacyClip(AnimationClip[] clips)
+        {
+            foreach (AnimationClip clip in clips)
+            {
+                if (clip != null && clip.legacy)
+                {
+                    return true;
+                }
+            }
+            return false;
         }
 
         private void PlayLegacyClip(AnimationClip clip)
