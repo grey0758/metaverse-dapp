@@ -776,8 +776,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ffaa5a95c8369f24c9bd0b3f7ccefeeb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Gameplay.FollowLocalPlayer
-  offset: {x: 0, y: 10.5, z: -5.5}
-  smoothing: 8
+  viewMode: 0
+  distance: 4.6
+  pitch: 17
+  lockedYawOffset: 0
+  smoothing: 10
+  rotationSmoothing: 14
+  lookSensitivity: 0.16
+  minPitch: -8
+  maxPitch: 48
+  minDistance: 1.35
+  maxDistance: 6.2
+  collisionRadius: 0.22
+  collisionPadding: 0.12
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!81 &825394254
 AudioListener:
   m_ObjectHideFlags: 0
@@ -819,7 +833,7 @@ Camera:
     height: 1
   near clip plane: 0.3
   far clip plane: 1000
-  field of view: 52
+  field of view: 60
   orthographic: 0
   orthographic size: 5
   m_Depth: 0

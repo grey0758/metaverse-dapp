@@ -10,9 +10,9 @@ namespace MetaverseGame.Gameplay
     {
         private static readonly Vector3[] SpawnPositions =
         {
-            new(0f, 1f, -10.6f),
-            new(-7.5f, 1f, -7.5f),
-            new(7.5f, 1f, -7.5f),
+            new(0f, 1f, -8.9f),
+            new(-7.5f, 1f, -6.8f),
+            new(7.5f, 1f, -6.8f),
             new(-7.5f, 1f, -1f),
             new(7.5f, 1f, -1f),
             new(0f, 1f, 6.5f),
@@ -38,6 +38,7 @@ namespace MetaverseGame.Gameplay
         private float lastInputAt;
         private float nextInputAt;
         private MobileInputRouter inputRouter;
+        private FollowLocalPlayer cameraController;
 
         public string PrivateRole => privateRole.Value.ToString();
 
@@ -45,6 +46,7 @@ namespace MetaverseGame.Gameplay
         {
             controller = GetComponent<CharacterController>();
             inputRouter = FindFirstObjectByType<MobileInputRouter>();
+            cameraController = FindFirstObjectByType<FollowLocalPlayer>();
         }
 
         public override void OnNetworkSpawn()
@@ -86,6 +88,10 @@ namespace MetaverseGame.Gameplay
             {
                 inputRouter = FindFirstObjectByType<MobileInputRouter>();
             }
+            if (cameraController == null)
+            {
+                cameraController = FindFirstObjectByType<FollowLocalPlayer>();
+            }
 
             bool interactionPressed = inputRouter != null
                 ? inputRouter.ConsumeInteractPressed()
@@ -104,6 +110,10 @@ namespace MetaverseGame.Gameplay
             Vector2 input = inputRouter != null
                 ? inputRouter.MoveInput
                 : MobileInputRouter.ReadDesktopFallbackMoveInput();
+            if (cameraController != null)
+            {
+                input = cameraController.ConvertMoveInput(input);
+            }
             SubmitMoveInputRpc(input, ++localMoveSequence);
         }
 

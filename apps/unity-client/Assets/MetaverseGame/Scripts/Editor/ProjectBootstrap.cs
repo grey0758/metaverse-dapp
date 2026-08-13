@@ -45,12 +45,12 @@ namespace MetaverseGame.Editor
             GameObject camera = new("Main Camera");
             camera.tag = "MainCamera";
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 10f, -13f),
-                Quaternion.Euler(34f, 0f, 0f));
+                new Vector3(0f, 2.8f, -14.5f),
+                Quaternion.Euler(10f, 0f, 0f));
             Camera sceneCamera = camera.AddComponent<Camera>();
             sceneCamera.clearFlags = CameraClearFlags.SolidColor;
             sceneCamera.backgroundColor = new Color(0.035f, 0.055f, 0.06f);
-            sceneCamera.fieldOfView = 52f;
+            sceneCamera.fieldOfView = 60f;
             camera.AddComponent<AudioListener>();
             camera.AddComponent<FollowLocalPlayer>();
 
@@ -135,10 +135,17 @@ namespace MetaverseGame.Editor
                 Object.DestroyImmediate(capsuleCollider, true);
             }
 
+            MeshRenderer rootRenderer = player.GetComponent<MeshRenderer>();
+            if (rootRenderer != null)
+            {
+                rootRenderer.enabled = false;
+            }
+
             GetOrAddComponent<CharacterController>(player);
             GetOrAddComponent<NetworkObject>(player);
             GetOrAddComponent<NetworkTransform>(player);
             GetOrAddComponent<NetworkPlayerController>(player);
+            GetOrAddComponent<NetworkPlayerVisual>(player);
         }
 
         private static GameObject CreateBlock(string name, Vector3 position, Vector3 scale)

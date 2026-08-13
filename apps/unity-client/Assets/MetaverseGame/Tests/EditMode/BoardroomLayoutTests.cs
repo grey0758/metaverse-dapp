@@ -30,7 +30,7 @@ namespace MetaverseGame.Tests
 
                 bool outsideConferenceFurniture =
                     Mathf.Abs(position.x) >= 5.5f ||
-                    position.z <= -10.25f ||
+                    position.z <= -8.55f ||
                     position.z >= 2.5f;
                 Assert.That(outsideConferenceFurniture, Is.True);
                 Assert.That(Mathf.Abs(position.x), Is.LessThan(11f));

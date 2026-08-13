@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using MetaverseGame.Gameplay;
-using Unity.Netcode;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -19,12 +18,11 @@ namespace MetaverseGame.Bootstrap
         public const int WindowBayCount = 5;
         public const int AcousticSlatCount = 35;
         public const float RoomHalfExtent = 12f;
-        public const float StrategyDisplayWidth = 5f;
+        public const float StrategyDisplayWidth = 5.8f;
         public const float StrategyDisplayHeight = StrategyDisplayWidth * 9f / 16f;
 
         private readonly List<Material> runtimeMaterials = new();
         private readonly List<Texture2D> runtimeTextures = new();
-        private readonly HashSet<int> styledPlayers = new();
 
         private Transform environmentRoot;
         private Shader surfaceShader;
@@ -45,24 +43,10 @@ namespace MetaverseGame.Bootstrap
         private Material displayMaterial;
         private Material ceramicMaterial;
         private Material foliageMaterial;
-        private Material visorMaterial;
-        private Material[] avatarMaterials;
-        private float nextPlayerStyleAt;
 
         private void Awake()
         {
             BuildEnvironment();
-        }
-
-        private void Update()
-        {
-            if (Time.unscaledTime < nextPlayerStyleAt)
-            {
-                return;
-            }
-
-            nextPlayerStyleAt = Time.unscaledTime + 0.75f;
-            StyleNetworkPlayers();
         }
 
         private void OnDestroy()
@@ -96,7 +80,6 @@ namespace MetaverseGame.Bootstrap
             BuildConferenceArea();
             BuildArrivalLounge();
             BuildLightFixtures();
-            StyleNetworkPlayers();
 
             StaticBatchingUtility.Combine(root);
         }
@@ -224,35 +207,6 @@ namespace MetaverseGame.Bootstrap
                 new Color(0.16f, 0.34f, 0.21f),
                 0f,
                 0.3f);
-            visorMaterial = CreateMaterial(
-                "Avatar Visor",
-                new Color(0.025f, 0.07f, 0.085f),
-                0.35f,
-                0.9f,
-                emission: new Color(0.02f, 0.34f, 0.46f));
-            avatarMaterials = new[]
-            {
-                CreateMaterial(
-                    "Avatar Cyan",
-                    new Color(0.10f, 0.62f, 0.72f),
-                    0.15f,
-                    0.68f),
-                CreateMaterial(
-                    "Avatar Coral",
-                    new Color(0.82f, 0.24f, 0.18f),
-                    0.12f,
-                    0.66f),
-                CreateMaterial(
-                    "Avatar Gold",
-                    new Color(0.88f, 0.56f, 0.16f),
-                    0.15f,
-                    0.7f),
-                CreateMaterial(
-                    "Avatar Green",
-                    new Color(0.22f, 0.62f, 0.34f),
-                    0.12f,
-                    0.65f),
-            };
         }
 
         private void ConfigureSceneLighting()
@@ -269,7 +223,7 @@ namespace MetaverseGame.Bootstrap
             {
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.backgroundColor = new Color(0.68f, 0.75f, 0.78f);
-                camera.fieldOfView = 56f;
+                camera.fieldOfView = 60f;
             }
 
             GameObject sunObject = GameObject.Find("Sun");
@@ -406,7 +360,7 @@ namespace MetaverseGame.Bootstrap
             CreateBox(
                 "Strategy Display Frame",
                 new Vector3(0f, 1.5f, 11.48f),
-                new Vector3(5.35f, 3f, 0.15f),
+                new Vector3(6.15f, 3.38f, 0.15f),
                 metalMaterial);
             CreateBox(
                 "Strategy Display",
@@ -707,51 +661,6 @@ namespace MetaverseGame.Bootstrap
             light.intensity = intensity;
             light.shadows = LightShadows.None;
             light.renderMode = LightRenderMode.Auto;
-        }
-
-        private void StyleNetworkPlayers()
-        {
-            if (avatarMaterials == null || avatarMaterials.Length == 0)
-            {
-                return;
-            }
-
-            NetworkPlayerController[] players = FindObjectsByType<NetworkPlayerController>(
-                FindObjectsSortMode.None);
-            foreach (NetworkPlayerController player in players)
-            {
-                int instanceId = player.gameObject.GetInstanceID();
-                if (!styledPlayers.Add(instanceId))
-                {
-                    continue;
-                }
-
-                NetworkObject networkObject = player.GetComponent<NetworkObject>();
-                int paletteIndex = networkObject != null
-                    ? (int)(networkObject.OwnerClientId % (ulong)avatarMaterials.Length)
-                    : 0;
-                Renderer renderer = player.GetComponent<Renderer>();
-                if (renderer != null)
-                {
-                    renderer.sharedMaterial = avatarMaterials[paletteIndex];
-                }
-
-                if (player.transform.Find("Avatar Visor") == null)
-                {
-                    CreateSphere(
-                        "Avatar Visor",
-                        new Vector3(0f, 0.34f, 0.44f),
-                        new Vector3(0.58f, 0.23f, 0.10f),
-                        visorMaterial,
-                        parent: player.transform);
-                    CreateCylinder(
-                        "Avatar Ground Ring",
-                        new Vector3(0f, -0.975f, 0f),
-                        new Vector3(0.72f, 0.025f, 0.72f),
-                        cyanLightMaterial,
-                        parent: player.transform);
-                }
-            }
         }
 
         private GameObject ApplyMaterial(string objectName, Material material)

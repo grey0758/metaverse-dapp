@@ -40,6 +40,14 @@ Current runtime SHA-256 values:
 
 ## Generation Record
 
+## Current Visual Calibration
+
+The scene now uses a lower shoulder-height third-person framing with a 60
+degree field of view. The front display frame is widened to match the broad
+screen proportion in the reference photographs, while the visible room keeps
+the cobalt acoustic wall, left window bays, right oak slat wall, three table
+rows, and linear ceiling fixtures as the primary landmarks.
+
 - Provider endpoint authorized for the attempt: `https://video.opencodex.uk/v1`.
 - Requested models: `gpt-image-2` for 1K work and `gpt-image-2-4k` for large
   sources.

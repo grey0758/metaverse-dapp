@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using MetaverseGame.Gameplay;
 using MetaverseGame.Input;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -19,6 +20,9 @@ namespace MetaverseGame.Bootstrap
         private static readonly Color DarkPanel = new(0.018f, 0.045f, 0.085f, 0.78f);
         private static readonly Color ActionIdle = new(1f, 0.31f, 0.22f, 0.9f);
         private static readonly Color ActionPressed = new(1f, 0.7f, 0.2f, 1f);
+        private static readonly Color ViewActive = new(0.19f, 0.72f, 0.82f, 0.95f);
+        private static readonly Color ViewInactive = new(0.025f, 0.06f, 0.10f, 0.92f);
+        private static readonly Color ViewSurface = new(0.19f, 0.91f, 1f, 0.07f);
 
         [SerializeField] private Vector2 referenceResolution = new(1280f, 720f);
         [SerializeField, Range(0f, 0.45f)] private float joystickDeadzone = 0.12f;
@@ -104,7 +108,9 @@ namespace MetaverseGame.Bootstrap
 
             Sprite circleSprite = CreateCircleSprite(128);
             CreateJoystick(inputRouter, circleSprite);
+            CreateLookSurface(circleSprite);
             CreateActionButton(inputRouter, circleSprite);
+            CreateCameraModeSelector();
         }
 
         private void CreateJoystick(MobileInputRouter inputRouter, Sprite circleSprite)
@@ -186,6 +192,118 @@ namespace MetaverseGame.Bootstrap
                 TextAnchor.MiddleCenter);
             Stretch(buttonText.rectTransform, 12f);
             buttonText.fontStyle = FontStyle.Bold;
+        }
+
+        private void CreateLookSurface(Sprite circleSprite)
+        {
+            GameObject zoneObject = CreateRectObject("Camera Look Zone", safeAreaRoot);
+            RectTransform zoneRect = zoneObject.GetComponent<RectTransform>();
+            zoneRect.anchorMin = new Vector2(0.52f, 0.34f);
+            zoneRect.anchorMax = new Vector2(1f, 0.82f);
+            zoneRect.offsetMin = Vector2.zero;
+            zoneRect.offsetMax = Vector2.zero;
+
+            Image captureSurface = zoneObject.AddComponent<Image>();
+            captureSurface.color = new Color(0f, 0f, 0f, 0.001f);
+            captureSurface.raycastTarget = true;
+
+            FollowLocalPlayer cameraController =
+                FindFirstObjectByType<FollowLocalPlayer>();
+            CameraLookSurface lookSurface = zoneObject.AddComponent<CameraLookSurface>();
+            lookSurface.Configure(cameraController);
+
+            GameObject reticleObject = CreateRectObject(
+                "Camera Look Reticle",
+                zoneRect);
+            RectTransform reticleRect = reticleObject.GetComponent<RectTransform>();
+            AnchorAt(reticleRect, new Vector2(0.78f, 0.38f), Vector2.zero);
+            reticleRect.sizeDelta = new Vector2(108f, 108f);
+            Image reticle = reticleObject.AddComponent<Image>();
+            reticle.sprite = circleSprite;
+            reticle.color = ViewSurface;
+            reticle.raycastTarget = false;
+            AddOutline(reticle, new Color(Cyan.r, Cyan.g, Cyan.b, 0.28f), 2f);
+
+            GameObject crosshairObject = CreateRectObject(
+                "Camera Look Crosshair",
+                reticleRect);
+            RectTransform crosshairRect = crosshairObject.GetComponent<RectTransform>();
+            Stretch(crosshairRect, 44f);
+            Image crosshair = crosshairObject.AddComponent<Image>();
+            crosshair.color = new Color(Cyan.r, Cyan.g, Cyan.b, 0.55f);
+            crosshair.raycastTarget = false;
+            AddOutline(crosshair, new Color(1f, 1f, 1f, 0.3f), 1f);
+        }
+
+        private void CreateCameraModeSelector()
+        {
+            GameObject panelObject = CreateRectObject(
+                "Camera View Selector",
+                safeAreaRoot);
+            RectTransform panelRect = panelObject.GetComponent<RectTransform>();
+            AnchorAt(panelRect, new Vector2(1f, 1f), new Vector2(-152f, -126f));
+            panelRect.sizeDelta = new Vector2(286f, 66f);
+
+            Image panelImage = panelObject.AddComponent<Image>();
+            panelImage.color = DarkPanel;
+            panelImage.raycastTarget = false;
+            AddOutline(panelImage, new Color(Cyan.r, Cyan.g, Cyan.b, 0.38f), 2f);
+
+            Text label = CreateText(
+                "View Label",
+                panelRect,
+                "VIEW",
+                16,
+                new Color(0.74f, 0.84f, 0.92f, 1f),
+                TextAnchor.MiddleLeft);
+            AnchorAt(label.rectTransform, new Vector2(0f, 0.5f), new Vector2(18f, 0f));
+            label.rectTransform.sizeDelta = new Vector2(62f, 42f);
+
+            CreateCameraModeButton(
+                panelRect,
+                "LOCK",
+                FollowLocalPlayer.ViewMode.Locked,
+                new Vector2(126f, 0f));
+            CreateCameraModeButton(
+                panelRect,
+                "FREE",
+                FollowLocalPlayer.ViewMode.Free,
+                new Vector2(220f, 0f));
+        }
+
+        private void CreateCameraModeButton(
+            RectTransform parent,
+            string label,
+            FollowLocalPlayer.ViewMode mode,
+            Vector2 position)
+        {
+            GameObject buttonObject = CreateRectObject(
+                $"View Mode {label}",
+                parent);
+            RectTransform buttonRect = buttonObject.GetComponent<RectTransform>();
+            AnchorAt(buttonRect, new Vector2(0f, 0.5f), position);
+            buttonRect.sizeDelta = new Vector2(86f, 44f);
+
+            Image buttonImage = buttonObject.AddComponent<Image>();
+            buttonImage.raycastTarget = true;
+
+            MobileCameraModeButton button =
+                buttonObject.AddComponent<MobileCameraModeButton>();
+            button.Configure(
+                FindFirstObjectByType<FollowLocalPlayer>(),
+                mode,
+                buttonImage,
+                ViewActive,
+                ViewInactive);
+
+            Text buttonText = CreateText(
+                $"View Mode {label} Text",
+                buttonRect,
+                label,
+                14,
+                Color.white,
+                TextAnchor.MiddleCenter);
+            Stretch(buttonText.rectTransform, 2f);
         }
 
         private void RefreshSafeArea(bool force)

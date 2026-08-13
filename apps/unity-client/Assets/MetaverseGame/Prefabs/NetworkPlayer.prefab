@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 724644663499600988}
   - component: {fileID: 1389696188520407314}
   - component: {fileID: 8587556394227503079}
+  - component: {fileID: 7453829102048151101}
   m_Layer: 0
   m_Name: NetworkPlayer
   m_TagString: Untagged
@@ -52,7 +53,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8223903592932452056}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -209,3 +210,17 @@ MonoBehaviour:
   inputRate: 30
   interactionDistance: 2.4
   inputTimeout: 0.25
+--- !u!114 &7453829102048151101
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8223903592932452056}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f872f1dd454f4e2faef9c02aaed4bdec, type: 3}
+  m_Name:
+  m_EditorClassIdentifier: MetaverseGame.Runtime::MetaverseGame.Gameplay.NetworkPlayerVisual
+  modelScale: 1
+  fallbackColor: {r: 0.1, g: 0.62, b: 0.72, a: 1}
