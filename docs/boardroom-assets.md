@@ -13,7 +13,29 @@ reference-room branding for this project, so the cropped display derivative
 below retains the photographed company mark and names; the remaining raw
 photos, people, and unrelated identifying details stay outside the product.
 
-## Runtime Set
+## Runtime Sets
+
+### Godot 2D primary client
+
+The primary client uses the following reviewed derivatives under
+`apps/godot-client/assets/boardroom/`:
+
+| Asset | Runtime size | Visual role | SHA-256 |
+|---|---:|---|---|
+| `carpet.png` | 1024 x 1024 | pale cool-gray room floor | `44d22f6b887fe76966238bef06c8a0d676a29214be70bfab08b4d4078daf6ce4` |
+| `oak.png` | 1024 x 1024 | table and panel surfaces | `a9e8cf255ee82fc0f0d173cffd504610c460a7be463e5df05fc97af27320ac87` |
+| `plato-display.png` | 2048 x 1152 | authorized room display crop | `974395f57d0ca3c6eedb3b470c5c4def37b63e93ab7e74586460fabc918e7d09` |
+
+`BoardroomArt` combines these bitmap surfaces with code-drawn architecture,
+chairs, planters, windows, banners, lectern, and display framing. Visuals,
+collision rectangles, and navigation obstructions remain separate layers.
+`BoardroomLayout` is the source for the last two.
+
+The 2D client has been visually smoked at 1280 x 720 and 960 x 540 on Linux
+X11 software rendering. That proves nonblank composition and responsive HUD
+placement, not physical mobile-device performance.
+
+### Retained Unity prototype
 
 The Bootstrap scene loads these stable filenames from
 `Assets/MetaverseGame/Resources/Boardroom/`. The first two filenames are kept
@@ -40,7 +62,7 @@ Current runtime SHA-256 values:
 | `SmokedWalnut.png` | `a9e8cf255ee82fc0f0d173cffd504610c460a7be463e5df05fc97af27320ac87` |
 | `StrategyDisplay.png` | `974395f57d0ca3c6eedb3b470c5c4def37b63e93ab7e74586460fabc918e7d09` |
 
-## Current Visual Calibration
+## Unity visual calibration
 
 The scene uses a lower shoulder-height third-person framing with a 64 degree
 field of view and an 8 degree inward locked-camera offset. Its authored shell

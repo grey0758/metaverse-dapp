@@ -27,6 +27,10 @@ coverage/
 Build/
 Builds/
 
+# Godot generated state and exports
+.godot/
+builds/
+
 # IDE and operating system
 .idea/
 .vs/

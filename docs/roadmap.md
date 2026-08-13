@@ -1,123 +1,98 @@
 # Vertical-slice roadmap
 
-The project advances by playable, testable slices. Chain work never blocks the
-guest game loop. The target networking choice and its measurable fallback gate
-are in [technology-stack.md](technology-stack.md).
+The project advances through playable, testable slices. Chain work never blocks
+the guest game loop.
 
-## Slice 0: framework
+## Slice 0: Godot 2D client foundation
 
-Current repository state:
+Completed:
 
-- validated shared wire protocol;
-- authoritative in-memory lobby, private roles, movement intents, and snapshots;
-- guest session API and explicitly disabled-by-default wallet verification;
-- Unity development-scene generator, socket reference client, committed NGO
-  Bootstrap scene, EditMode tests, and Windows/Android/Linux Dedicated Server
-  batch build methods;
-- optional React DApp and undeployed ERC-1155 owner-mint skeleton.
+- Godot `4.7.1-stable` project pinned under `apps/godot-client`;
+- 1280 x 720 landscape configuration with responsive 960 x 540 layout;
+- Plato boardroom presentation with four table rows, chairs, meeting screen,
+  lectern, windows, slat wall, and retained authorized textures;
+- `CharacterBody2D` collision movement and generated `StaticBody2D` furniture;
+- `NavigationRegion2D` baking plus `NavigationAgent2D` tap-to-move;
+- pinned MIT multitouch joystick; manual input cancels automatic navigation;
+- LOCK follow and bounded FREE drag `Camera2D` modes;
+- CC0 four-direction animated player and contextual USE action;
+- 54 automated checks covering project settings, layout, movement selection,
+  navigation, collision, camera, scene resources, and injected multitouch;
+- nonblank X11 visual smoke at 1280 x 720 and 960 x 540.
 
-Unity package resolution, C# compilation/tests, immutable commits, and the
-canonical remote are complete. Application identities and signing references
-remain player-release gates; a chain/domain remains optional and is needed
-only if wallet authentication is enabled.
+This slice is local. It does not claim Android/iOS device behavior or
+multiplayer authority.
 
-## Slice 0.5: authoritative network foundation
+## Slice 0.5: Godot authoritative network foundation
 
-This is the next implementation slice:
+- create a headless Godot match target sharing boardroom collision and rule data;
+- connect at least four independent clients to one server;
+- move spawn and physical movement authority off the client;
+- preserve ordered input and add correction/interpolation metrics;
+- implement one server-validated context interaction;
+- add reconnect or clean duplicate-session rejection;
+- prove owner-only private test state;
+- test at 150 ms RTT, 20 ms jitter, and 2 percent packet loss;
+- record CPU, memory, bandwidth, corrections, latency, and disconnect behavior;
+- retain the TypeScript room/rule tests until Godot parity exists.
 
-- activate and open Unity `6000.3.7f1`, resolve packages, and commit
-  `Packages/packages-lock.json`;
-- pin NGO `2.13.1`, Multiplayer Tools, and Multiplayer Play Mode in one
-  reviewed package change;
-- produce a local Unity Dedicated Server target and direct-IP client
-  connection;
-- replace local transform authority with ordered input sent to the server;
-- spawn at server-owned map points and collide against the same test-map
-  geometry;
-- replicate remote players with interpolation and correction metrics;
-- add one server-validated door or task interaction;
-- run four clients under the latency, jitter, and loss profile in the
-  technology decision;
-- keep the TypeScript server as a rule reference until C# parity tests pass,
-  then remove its movement authority.
-
-Current progress:
-
-- NGO `2.13.1`, Multiplayer Tools `2.2.9`, Multiplayer PlayMode `2.0.2`,
-  Unity Transport `2.6.0`, and the Windows-to-Linux toolchain are locked;
-- the direct-IP bootstrap, server-owned spawn and movement, shared arena
-  collision, remote transform replication, and one validated door interaction
-  are implemented in the committed scene;
-- session-ticket connection approval, reconnect-preserved role/spawn state,
-  duplicate live-ticket rejection, and owner-only private role state are
-  implemented pending the next Unity batch verification;
-- five EditMode tests pass and a clean Linux Dedicated Server build starts and
-  binds to loopback UDP on Linux;
-- four-client impairment testing, correction metrics, restart/reconnect smoke,
-  and C# room/role parity remain open.
-
-Exit gate: the dedicated-server spike passes every acceptance check in
-`technology-stack.md`. If it does not, benchmark Photon Fusion 2 with the same
-scene and conditions before expanding the game loop.
+Exit gate: every network check in `docs/technology-stack.md` passes from one
+identified commit. Do not expand the full game loop before this gate.
 
 ## Slice 1: complete social-deduction loop
 
 - lobby host controls and reconnect-safe player slots;
-- deterministic map spawn points and task assignments;
-- server-owned cooldowns, kill/report actions, body state, meetings, voting,
-  ejection, and win conditions;
+- deterministic spawn and task assignment;
+- server-owned cooldowns, kill/report, body state, meetings, voting, ejection,
+  and win conditions;
 - private state sent only to the owning session;
-- one low-poly test map with keyboard and mobile input;
-- automated room-state transition and cheating-input tests.
+- automated state-transition and cheating-input tests;
+- one complete match from lobby through win condition without a wallet.
 
-Exit gate: at least four clients can complete one full match from lobby through
-win condition without a wallet, with private state visible only to the owner
-and every material action accepted or rejected by the server.
+## Slice 2: map and asset production
 
-## Slice 2: multiplayer hardening
+- replace procedural room drawing with reviewed production tile/background
+  layers while preserving layout collision contracts;
+- create additional rooms and transitions from authorized references;
+- replace placeholder 16 x 16 character frames with a coherent production
+  character set and full locomotion/state animation;
+- establish texture, atlas, audio, memory, and load-time budgets;
+- add localization-ready UI and accessibility options.
 
-- replace development connection auth with API-issued, expiring, one-use
-  session tickets;
-- persistent account, moderation, and audit records;
-- matchmaker and room leases with reconnect grace periods;
-- message-rate limits, schema/version negotiation, idempotency, and abuse
-  controls;
-- provider-issued proximity/team voice tokens, never peer-generated authority;
-- load, packet-loss, reconnect, and host-failure test matrix.
+## Slice 3: multiplayer hardening
 
-Do not adopt Kubernetes or Agones merely to complete this slice. First measure
-one dedicated server's CPU, memory, bandwidth, startup time, and safe room
-capacity, then select a hosting and orchestration model.
+- API-issued expiring one-use connection tickets;
+- persistent account, moderation, audit, lobby, and match-result records;
+- matchmaking, room leases, reconnect grace periods, and abuse controls;
+- backend-issued proximity/team voice tokens;
+- load, packet-loss, reconnect, lifecycle, and host-failure matrices;
+- measured hosting choice after one server's room capacity is known.
 
-## Slice 3: mobile product
+## Slice 4: mobile product
 
-- touch movement, context actions, accessibility, haptics, and safe-area UI;
-- mobile URP performance budgets, object pooling, addressable assets, and
-  low-memory recovery;
-- Android device build/test path on a registered Windows build worker;
-- iOS Xcode archive/sign/device path on a registered macOS builder;
-- account deletion, privacy, parental/age, crash, and analytics flows.
+- approved Android and iOS package identities and signing references;
+- pinned Godot export templates and clean-checkout export scripts;
+- physical-device touch, safe-area, rotation, lifecycle, reconnect, performance,
+  thermal, battery, and low-memory tests;
+- haptics, account deletion, privacy, age/parental, crash, and analytics flows;
+- verified APK/AAB, Xcode archive, and store artifacts with hashes.
 
-## Slice 4: optional ownership DApp
+## Slice 5: optional ownership DApp
 
-This slice must not delay Slices 0.5 through 3. Start it only after a chain, RPC
-policy, public domain, custody model, and store-policy review are approved:
+Start only after chain, RPC policy, domain, custody, and store-policy approval:
 
-- CAIP-2/CAIP-10 account identity and EIP-1193 wallet provider boundary;
-- SIWE-style sessions with EOA plus ERC-1271/ERC-6492 verification;
-- ERC-1155/721 ownership and metadata indexing;
-- confirmation-aware, idempotent reward/settlement jobs outside live matches;
-- Web-only inventory/marketplace surfaces where mobile-store rules require it;
-- no token balance, purchased NFT, or wallet connection required for play.
+- CAIP-2/CAIP-10 identity and EIP-1193 provider boundaries;
+- server-issued SIWE-style challenges with replay protection;
+- ERC-1155/721 ownership indexing;
+- idempotent, confirmation-aware post-match settlement;
+- Web-only marketplace surfaces where store policy requires it;
+- no wallet, token, or purchased NFT required for play.
 
-## Slice 5: production and release
+## Slice 6: production release
 
-- durable data stores, migrations, backups, observability, alerting, and
-  incident runbooks;
-- clean-checkout CI with pinned Unity/package locks and retained artifacts;
-- contract audit, deployment approvals, multisig/role controls, and monitored
-  indexing;
-- real-device multiplayer, wallet deep-link, restore-session, upgrade, and
-  store-review matrices;
-- signed artifacts with commit, build number, editor/toolchain metadata, size,
-  and SHA-256 retained.
+- migrations, backups, observability, alerts, and incident runbooks;
+- clean-checkout CI with pinned engine/dependencies and retained artifacts;
+- real-device multiplayer and upgrade/restore matrices;
+- contract audit and deployment approvals if chain features ship;
+- signed artifacts tied to commit, build number, engine version, timestamp,
+  size, and SHA-256.

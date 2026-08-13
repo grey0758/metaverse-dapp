@@ -1,243 +1,157 @@
 # Technology stack decision
 
-Status: accepted for the first multiplayer spike, subject to the measurable
-exit gate below.
+Status: accepted for primary client development.
 
-Research snapshot: 2026-07-29 (America/Los_Angeles).
+Decision date: 2026-08-13 (America/Los_Angeles).
 
 ## Decision
 
-Build the game as a normal server-authoritative Unity multiplayer title. Treat
-the DApp as an optional account, ownership, and settlement integration outside
-the live match.
+Build the primary mobile game as a top-down 2D title in Godot
+`4.7.1-stable`. Treat the DApp as optional account, ownership, and settlement
+integration outside the live match.
 
-| Area | Selected direction | Timing |
+| Area | Selected direction | Status |
 |---|---|---|
-| Mobile game client | Unity `6000.3.7f1`, GameObjects/MonoBehaviours, URP, Input System, `CharacterController` | Now |
-| Real-time networking | Netcode for GameObjects (NGO) `2.13.1` over Unity Transport | Next spike |
-| Match authority | Unity Dedicated Server build using the same spatial rules and game-rule assemblies as the client | Next spike |
+| Mobile game client | Godot `4.7.1-stable`, GDScript, 2D renderer, Compatibility backend | Active |
+| Movement and collision | `CharacterBody2D` with authored `StaticBody2D` obstacles | Active |
+| Tap navigation | `NavigationRegion2D`, `NavigationPolygon`, `NavigationAgent2D` | Active |
+| Touch movement | Pinned MIT Virtual Joystick Godot runtime subset | Active |
+| Camera | `Camera2D`, LOCK follow with forward framing, FREE drag pan | Active |
+| Character presentation | `AnimatedSprite2D`, selected CC0 Kenney frames | Active |
+| Match authority | Future Godot headless server sharing 2D map and rule data | Next networking slice |
+| Existing TypeScript server | Room/rule/protocol reference; unchanged in this migration | Retain |
 | Account and control API | Node.js 22, TypeScript, Fastify, Zod, guest-first sessions | Keep |
-| Durable service data | PostgreSQL when in-memory state is retired; Redis only when leases, queues, or multi-instance fan-out require it | Later |
-| Voice | Managed provider with backend-issued room/team tokens; Vivox is the first integration candidate, not yet selected | After the game loop |
-| Web DApp | React, TypeScript, Vite, viem; add Reown AppKit/wagmi only when the wallet UX needs them | Optional |
-| Contracts | Solidity, Foundry, OpenZeppelin; ERC-1155 for cosmetic or collectible ownership | Optional |
-| Game-server hosting | Local direct connection first; select managed hosting or Agones only after a measured dedicated-server build exists | Later |
+| Web DApp | React, TypeScript, Vite, viem | Optional |
+| Contracts | Solidity, Foundry, OpenZeppelin, ERC-1155 skeleton | Optional |
 
-The DApp does not determine the engine, transport, movement model, physics,
-voice, or match architecture. Dependency direction must remain one way:
+The Unity `6000.3.7f1` client and its NGO Dedicated Server spike are retained
+under `apps/unity-client/` with their build evidence. They are no longer the
+primary client or networking direction. Do not implement new spatial gameplay
+in both engines.
+
+## Why Godot
+
+Godot is the selected mature open-source 2D framework for this product because
+it provides the complete interaction foundation in one MIT-licensed engine:
+
+- a dedicated 2D renderer and 2D physics server instead of a 3D engine merely
+  viewed from above;
+- collision-aware character movement through `CharacterBody2D`;
+- polygon baking, path queries, and path following through the built-in 2D
+  navigation server;
+- `Camera2D`, `AnimatedSprite2D`, multitouch events, responsive Control nodes,
+  safe-area APIs, headless execution, and mobile exporters;
+- scene/resource workflows that let maps and characters be replaced without
+  replacing the movement engine;
+- source availability and an MIT license, with no per-seat or per-install
+  runtime fee.
+
+The goal is not to write a general-purpose movement engine. Product code owns
+the boardroom layout, interaction definitions, presentation, and game rules;
+Godot owns the generic physics, pathfinding, rendering, input dispatch, camera,
+animation, and UI mechanics.
+
+## Alternatives considered
+
+| Framework | Strength | Reason not selected |
+|---|---|---|
+| Defold | Small runtime, Lua, mature mobile export | Less complete editor-side 2D navigation and scene tooling for this map-heavy workflow |
+| Cocos Creator | Mature 2D/mobile ecosystem and TypeScript | Larger framework surface and a less direct fit than Godot's built-in physics/navigation nodes |
+| Phaser | Excellent browser-first 2D framework | Native Android/iOS packaging and device lifecycle are not its primary runtime model |
+| LÖVE | Stable, small, permissive Lua framework | Requires assembling more editor, navigation, UI, and asset workflow infrastructure |
+| GDevelop | Accessible open-source no-code workflow | Current repository needs code-owned authority, protocol integration, and deterministic automated tests |
+| Unity 2D | Existing verified toolchain and broad ecosystem | Proprietary engine, larger mobile/runtime surface, and the current project was already accumulating custom glue around a 3D-first prototype |
+
+This is a product-fit decision, not a claim that one engine is universally best.
+
+## Interaction architecture
 
 ```text
-live match -> validated match result/outbox -> account and entitlement service
-                                                |
-                                                v
-                                      optional chain settlement
+touch joystick / desktop input -----+
+                                     +--> PlayerController
+tap target -> NavigationAgent2D -----+      |
+                                            v
+                                   CharacterBody2D.move_and_slide
+                                            |
+                          shared StaticBody2D room obstacles
+
+Camera2D: LOCK -> follow player + forward framing
+          FREE -> independent bounded touch drag
+```
+
+Rules enforced by the implementation:
+
+1. Joystick and desktop debug input enter one normalized manual vector.
+2. Any non-zero manual vector cancels active tap navigation immediately.
+3. `NavigationAgent2D` chooses path points; only `CharacterBody2D` performs
+   physical movement.
+4. Boardroom table definitions generate visuals, physical colliders, and
+   navigation obstructions from one layout source.
+5. Touch controls are anchored independently from the world camera.
+6. A visual interaction candidate is only presentation. A future multiplayer
+   server must validate and accept the actual action.
+
+## Multiplayer boundary
+
+The committed Godot boardroom currently proves local movement and interaction.
+It does not prove network authority. The next networking spike must use a
+headless Godot process so the same 2D collision and map data can own movement,
+then connect at least four independent clients.
+
+The existing `services/game-server` remains unchanged as a tested reference for
+rooms, private roles, ordered input, and snapshots. It must not become a second
+production spatial authority. Account, allocation, moderation, inventory, and
+post-match workflows may remain in Node/Fastify.
+
+Before the multiplayer direction is accepted, one server and four clients must
+demonstrate:
+
+- server-owned spawn, movement, collision, and one context action;
+- ordered input and rejection of speed, teleport, range, and cooldown cheats;
+- 150 ms round-trip latency, 20 ms jitter, and 2 percent packet-loss testing;
+- reconnect or clean rejection without duplicate players;
+- owner-only private role/test state;
+- CPU, memory, bandwidth, correction, latency, and disconnect measurements.
+
+Do not add a wallet SDK, RPC request, or contract confirmation to this path.
+
+## DApp boundary
+
+Dependency direction remains one way:
+
+```text
+live match -> validated result/outbox -> account and entitlement service
+                                              |
+                                              v
+                                    optional chain settlement
 
 chain indexer -> ownership projection -> account/inventory UI outside a match
 ```
 
-No wallet provider, RPC call, token balance, or contract confirmation is
-allowed in the movement, interaction, meeting, voting, or win-condition path.
+The chain may record ownership or infrequent settlement. It cannot own
+movement, collision, matchmaking, voice, roles, cooldowns, meetings, votes, or
+match results. Guest play remains the default.
 
-## Why the current WebSocket loop is not the target
+## Pinned community dependency
 
-`services/game-server` is useful as a protocol and authority proof. It already
-tests room membership, private roles, ordered input, and a fixed server tick.
-It is not yet a production 3D simulation:
+The virtual joystick runtime subset comes from
+`MarcoFazioRandom/Virtual-Joystick-Godot` commit
+`b90891ee990881757105883677adbb619f4c319c` under MIT. Godot 4.7 introduced a
+native class with the same name, so the imported global class is namespaced as
+`FeatherfallVirtualJoystick`; its touch and output algorithm is unchanged.
 
-- Unity moves a `CharacterController` through a physics scene, while the
-  TypeScript server integrates unbounded `x/z` coordinates with no map
-  collision.
-- Doors, walls, ramps, line of sight, kill distance, body interaction, and
-  navigation would have to be implemented twice in C# and TypeScript.
-- JSON over WebSocket is suitable for the prototype but provides none of the
-  object replication, unreliable delivery, interpolation, reconciliation, or
-  network diagnostics expected from a real-time game stack.
-- Maintaining two implementations of the spatial rules would create an
-  exploitable disagreement between client and server.
-
-The migration must be incremental:
-
-1. Keep the TypeScript server and its tests as the known-good room/rule
-   reference while the Unity networking spike is built.
-2. Prove direct connection from two clients to one Unity Dedicated Server,
-   server-owned spawning, movement, collision, and one context interaction.
-3. Move role and match-phase rules into engine-independent C# assemblies that
-   can run in EditMode tests and in the dedicated server.
-4. After parity tests pass, remove real-time movement authority from the
-   TypeScript service. Reuse Node/Fastify only for account, session allocation,
-   moderation, inventory, and post-match workflows.
-
-There must never be two production authorities for the same match state.
-
-## Why NGO is the first choice
-
-The first target is a small social-deduction room, currently capped at 12
-players, not a high-player-count shooter:
-
-- NGO `2.13.1` officially supports Unity 6.0 and later, Mono and IL2CPP, Linux,
-  Windows, macOS, iOS, and Android.
-- The current project already uses GameObjects, MonoBehaviours, and
-  `CharacterController`; Netcode for Entities would add ECS conversion cost
-  without solving a current scale problem.
-- A Unity Dedicated Server can execute the same colliders, map data, and
-  interaction queries as the client build.
-- The official Boss Room and Bitesize samples provide maintained reference
-  patterns for small-session co-op networking.
-- NGO does not force a hosting or per-concurrent-user vendor decision before
-  the core game is fun.
-
-NGO is not assumed to be sufficient merely because it is official. Its
-prediction and lag-compensation facilities are less complete than Photon
-Fusion's. The spike must pass the network impairment gate before the project
-commits more gameplay code to it.
-
-Candidate package pins for that spike are:
-
-| Package | Researched version | Rule |
-|---|---:|---|
-| `com.unity.netcode.gameobjects` | `2.13.1` | Pin directly |
-| `com.unity.transport` | `2.6.0` through NGO | Do not override until Unity resolves the complete graph |
-| `com.unity.multiplayer.tools` | `2.2.9` | Development diagnostics |
-| `com.unity.multiplayer.playmode` | `2.0.2` | Multi-client editor testing |
-| `com.unity.services.multiplayer` | `2.3.0` | Deferred; not needed for direct-IP gameplay |
-
-These are research inputs, not an instruction to bypass Unity package
-resolution. Add them only in the activated pinned editor, review the resolved
-versions together, and commit the generated `Packages/packages-lock.json`.
-
-## Authority and interaction model
-
-The client sends intent. The dedicated server decides the result.
-
-```text
-local input
-  -> input command with sequence/tick
-  -> server simulation and collision
-  -> authoritative state
-  -> snapshots/events
-  -> client interpolation and local presentation
-```
-
-For a context action such as task use, door use, kill, report, or meeting:
-
-1. The client may highlight a nearby candidate for responsiveness.
-2. It sends `TryInteract(targetNetworkId, action, sequence)`.
-3. The server validates authentication, match phase, alive/dead state, role,
-   target existence, distance, line of sight, cooldown, and one-time use.
-4. The server changes state and emits the minimum public and private events.
-5. The client only renders the accepted result.
-
-Private roles, team-only state, task assignments, and hidden cooldowns use
-owner- or target-scoped messages. They must not exist in a public replicated
-object and then be hidden only by the UI.
-
-Start with a 30 Hz authoritative simulation. Treat that as a hypothesis to
-measure, not a permanent magic number. Input sampling, snapshot delivery, and
-render interpolation may run at different rates.
-
-## Spike acceptance gate
-
-Before implementing the full social-deduction loop, the same small test map
-must demonstrate:
-
-- one desktop dedicated server and at least four independent clients;
-- server-owned spawn positions and capsule collision against the same walls;
-- smooth local and remote movement under 150 ms round-trip latency, 20 ms
-  jitter, and 2 percent simulated packet loss;
-- no client-authoritative teleport, speed, interaction-distance, or cooldown
-  decision;
-- one server-validated door/task interaction;
-- reconnect or explicit clean rejection without duplicating a player;
-- private test state visible only to its intended client;
-- repeatable EditMode tests for pure game rules and PlayMode/integration tests
-  for ownership and interaction validation;
-- captured CPU, memory, bandwidth, correction count, and disconnect metrics.
-
-If NGO cannot meet this gate without a disproportionate custom prediction
-layer, implement the same scene and gate in Photon Fusion 2 before adding more
-gameplay. FishNet is the second non-Unity candidate if its custom license is
-accepted. Choose from measured behavior and total operating cost, not feature
-lists.
-
-## Alternatives considered
-
-| Stack | Useful strengths | Main concern here | Disposition |
-|---|---|---|---|
-| Photon Fusion 2 | Prediction, compression, lag compensation, dedicated-server and host topologies | Proprietary service/licensing and greater vendor coupling | Measured fallback |
-| FishNet 4 | Server-authoritative design, prediction, rollback, lag compensation, no CCU cap | Custom source-available license and smaller ecosystem | License-reviewed fallback |
-| Mirror | Mature MIT project, large community, many transports | Less direct Unity 6/MPS alignment; current main docs still recommend older Unity LTS versions | Not selected |
-| Nakama | Mature account/social backend and fixed-tick authoritative match runtime | Unity physics and spatial rules still need a separate server implementation | Future meta-service candidate |
-| Colyseus | Productive TypeScript rooms, matchmaking, state synchronization, Unity SDK | Same duplicate-physics problem as the current server for 3D authority | Protocol alternative only |
-| Netcode for Entities | High-scale ECS networking and official 128+ player sample | Unnecessary DOTS complexity for a 12-player GameObject game | Revisit only after profiling |
-| Custom WebSocket | Full control and already running | Must build transport semantics, prediction, tooling, and spatial parity ourselves | Prototype only |
-
-## Community and maintenance signal
-
-This dated snapshot is a maintenance/adoption signal, not a quality ranking:
-
-| Project | GitHub stars | Latest release seen | Recent activity seen |
-|---|---:|---|---|
-| NGO | 2,316 | `2.13.1`, 2026-07-24 | 2026-07-29 |
-| Mirror | 6,269 | `v96.11.1`, 2026-07-26 | 2026-07-26 |
-| FishNet | 1,989 | `4.7.2`, 2026-04-17 | 2026-04-17 |
-| Nakama | 13,005 | `3.40.0`, 2026-07-13 | 2026-07-24 |
-| Colyseus | 7,138 | `0.17`, 2026-02-06 | 2026-07-24 |
-
-Photon Fusion is not meaningfully comparable by GitHub stars because its core
-SDK is not developed as one of these public repositories.
-
-## DApp boundary
-
-The existing TypeScript/EVM choices are compatible with any Unity networking
-choice:
-
-- Keep guest or platform account login as the default.
-- Link a wallet as an additional credential, never as the player identity
-  required to enter a match.
-- Verify wallet challenges in the API with server-issued nonces and explicit
-  domain, URI, chain, expiry, and replay checks.
-- Project indexed ownership into a normal database/read model. A mobile client
-  reads that model outside the live match instead of querying an RPC endpoint.
-- Submit any approved reward or ownership write through an idempotent outbox
-  and confirmation-aware worker after the match.
-- Use ERC-1155 for optional collectibles. Do not introduce an ERC-20 merely
-  because the product is called a DApp.
-- Keep marketplace and transfer flows in the Web DApp when mobile-store rules
-  make native presentation risky.
-
-The chain can record ownership or infrequent settlement. It cannot own
-movement, collision, matchmaking, voice, roles, cooldowns, votes, or match
-results.
+The project setting `emulate_touch_from_mouse=true` exists only for desktop
+development. `emulate_mouse_from_touch=false` prevents duplicate mobile input.
 
 ## Sources
 
-Primary product and platform sources:
+- [Godot license](https://godotengine.org/license/)
+- [Godot 2D introduction](https://docs.godotengine.org/en/4.7/getting_started/first_2d_game/index.html)
+- [CharacterBody2D](https://docs.godotengine.org/en/4.7/classes/class_characterbody2d.html)
+- [NavigationAgent2D](https://docs.godotengine.org/en/4.7/classes/class_navigationagent2d.html)
+- [Using navigation agents](https://docs.godotengine.org/en/4.7/tutorials/navigation/navigation_using_navigationagents.html)
+- [Multiple resolutions](https://docs.godotengine.org/en/4.7/tutorials/rendering/multiple_resolutions.html)
+- [Virtual Joystick Godot](https://github.com/MarcoFazioRandom/Virtual-Joystick-Godot)
 
-- [NGO 2.13 documentation](https://docs.unity3d.com/Packages/com.unity.netcode.gameobjects@2.13/manual/index.html)
-- [Unity Dedicated Server manual](https://docs.unity3d.com/6000.3/Documentation/Manual/dedicated-server.html)
-- [Unity Multiplayer Services SDK](https://docs.unity.com/en-us/mps-sdk)
-- [Unity Boss Room sample](https://github.com/Unity-Technologies/com.unity.multiplayer.samples.coop)
-- [Unity Bitesize samples](https://github.com/Unity-Technologies/com.unity.multiplayer.samples.bitesize)
-- [Photon Fusion introduction](https://doc.photonengine.com/fusion/current/fusion-intro)
-- [FishNet documentation](https://fish-networking.gitbook.io/docs)
-- [FishNet license](https://github.com/FirstGearGames/FishNet/blob/main/LICENSE.md)
-- [Mirror documentation](https://mirror-networking.gitbook.io/docs)
-- [Nakama authoritative multiplayer](https://heroiclabs.com/docs/nakama/concepts/multiplayer/authoritative/)
-- [Colyseus documentation](https://docs.colyseus.io/)
-- [Agones overview](https://agones.dev/site/docs/overview/)
-
-GitHub repository and release metadata were read through the public GitHub API
-on the research date.
-
-Curator continuity sources:
-
-- framework session `019faef5-4b94-72a0-b729-3edc475b58a8`;
-- original mobile DApp standards session
-  `019fad1c-4b33-7e40-9083-bb92dfcd9698`;
-- this documentation action `fd319122-8363-461c-9744-8f9c5be5f5e2`.
-
-Curator query keywords:
-
-`metaverse-dapp Unity multiplayer networking interaction authoritative server
-DApp boundary` and `Unity Goose Goose Duck social deduction multiplayer
-blockchain iOS Android game architecture technology stack`.
+The Godot `4.7.1-stable` Linux binary used for initial validation was checked
+against the release's official `SHA512-SUMS.txt` before use.

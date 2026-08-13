@@ -1,34 +1,41 @@
 # Character Assets
 
-## Runtime Character
+## Godot 2D primary character
 
-The default player visual is `character-q.fbx` from Kenney's official
-[Blocky Characters](https://www.kenney.nl/assets/blocky-characters) package.
-The package is marked CC0 1.0 in the included `Kenney-Blocky-Characters-
-License.txt`; the source archive also documents 27 animations per character,
-including `idle` and `walk`. The model is loaded at runtime below
-`NetworkPlayer` so network ownership, transform replication, and the
-`CharacterController` remain on the root object.
+The primary Godot client uses twelve selected 16 x 16 four-direction walking
+frames from Kenney's official RPG Urban Pack 1.0. The package's bundled notice
+marks it Creative Commons Zero (CC0 1.0).
 
-`character-q` was selected from the package's official per-character preview:
-it is the formal black-suit, white-shirt, red-tie variant. The earlier
-`character-j` candidate is a uniformed police character and is no longer used
-as the boardroom default.
+- Source: <https://kenney.nl/assets/rpg-urban-pack>
+- Archive SHA-256:
+  `4541d89d639fc7d1e905dd925e55b1c4977a41d983516228db1d57173bb9afaf`
+- Runtime directory:
+  `apps/godot-client/assets/characters/kenney-rpg-urban/`
+- License copy: `LICENSE.txt` in the same directory
+- Imported subset: three walking frames each for left, right, up, and down
 
-Kenney was retained after checking current community asset options because it
-combines an explicit CC0 license, low-poly mobile geometry, one compact texture
-atlas, business-attire variants, and locomotion clips in the same official
-download. KayKit's CC0 animated packs remain a useful alternative, but their
-fantasy character direction does not fit this boardroom as closely. Mixamo is
-useful for animation retargeting, but does not provide the same simple CC0
-redistribution contract for a bundled default character.
+The selected dark-haired office character is scaled by Godot's
+`AnimatedSprite2D`. `PlayerController` selects direction from movement velocity
+and holds the middle frame while idle. Character art is presentation only;
+the `CharacterBody2D` collision shape and movement controller remain stable
+when the art is replaced.
 
-| Asset | Source | SHA-256 | Runtime role |
-|---|---|---|---|
-| `character-q.fbx` | Kenney Blocky Characters 2.0, official download | `d6417d8ee0fe8d02386e2c0a144642cd3d1abeb1b9832f4c5d804f3b31faff0d` | Formal-suit low-poly player |
-| `Textures/texture-q.png` | Same package | `bf220bbc945072a4fce31118b6585207445ddac1c2836b350d10fe0d49fed5ca` | Imported character atlas |
+This is an explicit first-slice placeholder. Production character work should
+retain the four-direction animation contract or update it deliberately with
+tests, and must include redistribution rights suitable for the repository and
+mobile binaries.
 
-The visual component plays the imported legacy `idle` and `walk` clips based
-on replicated movement, normalizes the model to a two-meter gameplay height,
-and keeps a procedural fallback for partial checkouts. EditMode coverage loads
-the Resource, verifies both clips, and instantiates the runtime visual contract.
+## Retained Unity 3D character
+
+The Unity prototype uses `character-q.fbx` from Kenney's official Blocky
+Characters 2.0 package under CC0 1.0. It is a formal black-suit, white-shirt,
+red-tie variant with imported `idle` and `walk` clips.
+
+| Asset | SHA-256 | Runtime role |
+|---|---|---|
+| `character-q.fbx` | `d6417d8ee0fe8d02386e2c0a144642cd3d1abeb1b9832f4c5d804f3b31faff0d` | Historical Unity player model |
+| `Textures/texture-q.png` | `bf220bbc945072a4fce31118b6585207445ddac1c2836b350d10fe0d49fed5ca` | Historical Unity character atlas |
+
+These 3D files remain for Unity build reproducibility. They are not the source
+for the Godot 2D sprite and should not be expanded into a parallel primary
+character pipeline.

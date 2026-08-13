@@ -1,125 +1,106 @@
 # Architecture
 
-The selected target stack and alternatives are recorded in
-[technology-stack.md](technology-stack.md). The important product rule is that
-real-time gameplay and optional blockchain ownership are separate systems.
+The selected client stack is recorded in
+[technology-stack.md](technology-stack.md). Real-time gameplay and optional
+blockchain ownership remain separate systems.
 
 ## Runtime planes
 
 ```text
-                          control and account plane
-Unity mobile client ─────── HTTPS ───────> Fastify API
-        │                                      │
-        │ NGO / Unity Transport                ├── account, inventory,
-        │                                      │   moderation, allocation
-        v                                      │
-Unity Dedicated Server ── post-match event ────┘
+                         control and account plane
+Godot mobile client -------- HTTPS --------> Fastify API
+        |                                        |
+        | future authoritative game transport   +-- account, inventory,
+        v                                        |   moderation, allocation
+Godot headless match server -- result/outbox ----+
   movement, collision,
   roles, tasks, meetings
 
-Web DApp ── HTTPS / EIP-1193 ──> API, indexer, settlement worker
-                                           │
-                                           v
-                               optional EVM asset contracts
+Web DApp -- HTTPS / EIP-1193 --> API, indexer, settlement worker
+                                             |
+                                             v
+                                 optional EVM asset contracts
 ```
 
-The Unity Dedicated Server is the target authority for one live session. The
-client submits intent, never final state. The API controls identity and
-long-lived product data but cannot decide a live movement or interaction.
-Chain calls are outside the live-match process and are never required to play.
+The Godot headless server is the target authority for a live session because it
+can share the same 2D map, collision, and rule data as the client. The committed
+client does not yet implement this network plane, so current local movement is
+prototype behavior rather than a security boundary.
+
+## Component ownership
+
+| Component | Responsibility |
+|---|---|
+| `apps/godot-client` | Primary 2D mobile presentation, input, local prediction, maps, and client UX |
+| Future Godot headless target | Authoritative spatial simulation and match rules |
+| `services/game-server` | Retained TypeScript room/rule/protocol reference during migration |
+| `services/api` | Guest sessions, optional wallet verification, account/control APIs |
+| `packages/protocol` | Validated service wire schemas; adapt deliberately at the Godot boundary |
+| `apps/web-dapp` | Optional browser wallet and account surface |
+| `packages/contracts` | Optional ownership contracts, never live gameplay |
+| `apps/unity-client` | Frozen 3D prototype and historical validation evidence |
+
+## Client scene
+
+The first Godot scene is deliberately layered:
+
+```text
+Boardroom
+  BoardroomArt             replaceable 2D presentation
+  NavigationRegion2D       engine-baked walkable polygons
+  Obstacles                StaticBody2D collision generated from layout data
+  MoveTargetMarker         client-only destination feedback
+  Player                   CharacterBody2D
+    NavigationAgent2D      engine path query and path progression
+    AnimatedSprite2D       replaceable CC0 character frames
+  BoardroomCamera          LOCK/FREE Camera2D behavior
+  GameHud                  safe-area touch and status controls
+```
+
+`BoardroomLayout` is the source for table rows, walkable bounds, collision
+rectangles, navigation obstructions, spawn, and interaction points. Art code
+consumes this data but does not decide where the player may walk.
 
 ## Authority ownership
 
-| State or action | Authority |
-|---|---|
-| Input sampling and local presentation | Owning Unity client |
-| Movement, collision, spawn, doors, tasks, kills, reports | Unity Dedicated Server |
-| Roles, cooldowns, meetings, votes, ejection, win condition | Unity Dedicated Server |
-| Guest/platform account, bans, inventory read model, match history | Account API and durable database |
-| Match allocation and reconnect lease | Account/control API plus session host |
-| Voice room/team token | Backend; media remains with the selected voice provider |
-| Wallet link and signature challenge | Account API |
-| Asset ownership and approved settlement | EVM contract plus confirmation-aware indexer/worker |
+| State or action | Current owner | Required multiplayer owner |
+|---|---|---|
+| Input sampling and local presentation | Owning Godot client | Owning Godot client |
+| Camera and destination marker | Owning Godot client | Owning Godot client |
+| Local boardroom movement/collision | Godot client prototype | Godot headless match server |
+| Spawn, doors, tasks, kills, reports | Not implemented in Godot multiplayer | Godot headless match server |
+| Roles, meetings, votes, win condition | TypeScript reference only | Godot headless match server |
+| Account, bans, inventory, history | Account API and future database | Same |
+| Wallet link and signature challenge | Account API | Same |
+| Approved ownership/settlement | EVM contract plus indexer/worker | Same |
 
-Only the minimum result crosses from the match plane to the control plane. A
-chain indexer may project ownership into account/inventory views, but that view
-cannot change a match already in progress.
-
-## Current scaffold versus target
-
-The current TypeScript `services/game-server` remains a valid framework
-prototype. It proves room state, private role delivery, ordered input, and a
-fixed tick. It does not share Unity collision or map rules, so it must not grow
-into a second production spatial authority.
-
-The first NGO foundation now moves spawn, collision-integrated movement, and
-one door interaction to a Unity Dedicated Server. It has a real Linux server
-build and loopback startup proof, but has not passed the four-client impairment,
-reconnect, private-state, or metrics gates. Keep the TypeScript tests as a
-behavior reference until the C# rule and integration tests reach parity, then
-retain Node only for control-plane responsibilities. Do not run both
-implementations as authorities for one match.
-
-## First vertical slice
-
-1. Guest session creation through the API.
-2. Direct connection to one local Unity Dedicated Server.
-3. Server-owned room join, spawn, private role assignment, and match phase.
-4. Sequence-ordered movement intent, server collision, and interpolated remote
-   players.
-5. One server-validated context action, then kill, report, meeting, vote, and
-   win-condition rules.
-6. Keyboard and mobile input driving the same gameplay commands.
-7. Optional browser wallet challenge and EOA signature verification outside
-   the match.
-8. Owner-controlled ERC-1155 item minting skeleton with no gameplay powers.
-
-The current framework has completed item 1, a local Dedicated Server form of
-item 2, the spawn/movement foundation of item 4, and one door form of item 5.
-Room/role authority is still only proven in the TypeScript reference, and the
-Unity path has not passed the complete multiplayer acceptance gate. The
-vertical slice does not claim production persistence, voice, matchmaking,
-moderation storage, ERC-1271/6492 verification, store billing, chain
-deployment, or signed mobile artifacts.
+Only the minimum validated match result crosses from the match plane to the
+control plane. Chain ownership cannot change a match already in progress.
 
 ## Interaction contract
 
-A client may highlight an interaction candidate locally, but it sends only an
-attempt containing the target network ID, action, and input sequence. The
-server checks:
+A client may highlight a nearby object, but a multiplayer action contains only
+intent and sequence. The server must validate:
 
-- authenticated player and current connection ownership;
+- authenticated connection ownership;
 - match phase and alive/dead state;
 - role and action permission;
-- target existence and current interactable state;
-- authoritative range and line of sight;
-- cooldown, rate limit, and one-time-use/idempotency state.
+- target existence and authoritative state;
+- authoritative distance and line of sight;
+- cooldown, rate limit, and idempotency.
 
-Only the server changes the task, door, body, meeting, vote, or kill state.
-Private role and task data use target-scoped messages rather than public state
-hidden by client UI.
+Only the server changes a task, door, body, meeting, vote, or kill. Private role
+and task data must be target-scoped, not public state hidden by client UI.
 
-## Trust boundaries
+## Migration rules
 
-- Unity, Web DApp, wallets, and all provider responses are untrusted inputs.
-- Role assignment is sent only to the corresponding authenticated connection.
-- Nonces are generated and consumed by the API; clients do not choose them.
-- In-memory sessions are development-only and disappear on restart.
-- Smart-contract and RPC calls are never submitted by the dedicated server
-  during a live match.
-- Asset metadata and 3D files remain off-chain; contracts store ownership and
-  URI references only.
+1. Keep the TypeScript server tests as a behavior reference.
+2. Do not extend Unity and Godot spatial gameplay in parallel.
+3. Build the first Godot headless authority with the same boardroom collision
+   source as the client.
+4. Prove four-client authority and impairment behavior before adding the full
+   social-deduction loop.
+5. Remove duplicate real-time authority only after parity tests pass; retain
+   Node for control-plane responsibilities.
 
-## Planned service extraction
-
-The current in-memory services keep the first slice easy to run. Before public
-multiplayer testing, add or extract:
-
-- Unity Dedicated Server build and lifecycle endpoint;
-- session allocation, connection tickets, and reconnect leases;
-- account and inventory persistence;
-- durable lobby and match-result records;
-- moderation/audit events;
-- result settlement jobs with idempotency keys;
-- voice provider tokens issued by the backend;
-- chain indexer and confirmation-aware settlement workers.
+There must never be two production authorities for the same match state.
