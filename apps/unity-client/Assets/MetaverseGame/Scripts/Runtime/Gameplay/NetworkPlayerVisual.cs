@@ -11,12 +11,12 @@ namespace MetaverseGame.Gameplay
     [DisallowMultipleComponent]
     public sealed class NetworkPlayerVisual : MonoBehaviour
     {
-        private const string CharacterResource = "Characters/character-j";
+        private const string CharacterResource = "Characters/character-q";
         private const float CharacterHeight = 2f;
         private const float MovementThreshold = 0.08f;
 
         [SerializeField] private float modelScale = 1f;
-        [SerializeField] private Color fallbackColor = new(0.10f, 0.62f, 0.72f);
+        [SerializeField] private Color fallbackColor = new(0.16f, 0.18f, 0.22f);
         [SerializeField] private bool showGroundMarker = true;
 
         private GameObject visualRoot;
@@ -85,7 +85,7 @@ namespace MetaverseGame.Gameplay
             if (source != null)
             {
                 GameObject instance = Instantiate(source, visualRoot.transform);
-                instance.name = "Kenney Blocky Character J";
+                instance.name = "Kenney Blocky Character Q";
                 NormalizeImportedModel(instance);
                 UsesCommunityModel = true;
                 ConfigureAnimation(instance);

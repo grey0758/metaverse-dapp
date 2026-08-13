@@ -22,6 +22,7 @@ namespace MetaverseGame.Gameplay
         private const float PlayerEyeTargetHeight = 1.02f;
         public const float DefaultDistance = 5f;
         public const float DefaultPitch = 10f;
+        public const float DefaultLockedYawOffset = 8f;
         private const float DefaultLookSensitivity = 0.16f;
         private const float DefaultMinDistance = 1.35f;
         private const float DefaultMaxDistance = 6.2f;
@@ -29,7 +30,8 @@ namespace MetaverseGame.Gameplay
         [SerializeField] private ViewMode viewMode = ViewMode.Locked;
         [SerializeField, Min(0.1f)] private float distance = DefaultDistance;
         [SerializeField, Range(-10f, 55f)] private float pitch = DefaultPitch;
-        [SerializeField, Range(-180f, 180f)] private float lockedYawOffset;
+        [SerializeField, Range(-180f, 180f)]
+        private float lockedYawOffset = DefaultLockedYawOffset;
         [SerializeField, Min(0.1f)] private float smoothing = 10f;
         [SerializeField, Min(0.1f)] private float rotationSmoothing = 14f;
         [SerializeField, Min(0.01f)] private float lookSensitivity = DefaultLookSensitivity;
@@ -51,8 +53,10 @@ namespace MetaverseGame.Gameplay
         public ViewMode CurrentViewMode => viewMode;
         public bool IsFreeView => viewMode == ViewMode.Free;
         public float CurrentYaw => currentYaw;
+        public float TargetYaw => freeYaw;
         public float CurrentPitch => currentPitch;
         public float Distance => distance;
+        public uint LookInputRevision { get; private set; }
 
         private void Awake()
         {
@@ -142,15 +146,7 @@ namespace MetaverseGame.Gameplay
                 return;
             }
 
-            if (mode == ViewMode.Free)
-            {
-                freeYaw = currentYaw;
-            }
-            else
-            {
-                freeYaw = currentYaw;
-            }
-
+            freeYaw = currentYaw;
             viewMode = mode;
         }
 
@@ -159,13 +155,13 @@ namespace MetaverseGame.Gameplay
             SetViewMode(viewMode == ViewMode.Locked ? ViewMode.Free : ViewMode.Locked);
         }
 
-        public void ApplyLookDelta(Vector2 screenDelta)
+        public bool ApplyLookDelta(Vector2 screenDelta)
         {
             if (viewMode != ViewMode.Free ||
                 !IsFinite(screenDelta.x) ||
                 !IsFinite(screenDelta.y))
             {
-                return;
+                return false;
             }
 
             freeYaw += screenDelta.x * lookSensitivity;
@@ -173,6 +169,8 @@ namespace MetaverseGame.Gameplay
                 currentPitch - screenDelta.y * lookSensitivity,
                 minPitch,
                 maxPitch);
+            LookInputRevision++;
+            return true;
         }
 
         public Vector2 ConvertMoveInput(Vector2 input)

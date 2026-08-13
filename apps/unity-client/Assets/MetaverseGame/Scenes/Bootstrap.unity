@@ -779,7 +779,7 @@ MonoBehaviour:
   viewMode: 0
   distance: 5
   pitch: 10
-  lockedYawOffset: 0
+  lockedYawOffset: 8
   smoothing: 10
   rotationSmoothing: 14
   lookSensitivity: 0.16
@@ -859,13 +859,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825394252}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.08715574, y: 0, z: 0, w: 0.9961947}
-  m_LocalPosition: {x: -6.35, y: 2.9, z: -10.98}
+  m_LocalRotation: {x: 0.08694343, y: 0.06949103, z: -0.006080463, w: 0.99376804}
+  m_LocalPosition: {x: -7.04, y: 2.89, z: -10.93}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 10, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 10, y: 8, z: 0}
 --- !u!1 &1471177575
 GameObject:
   m_ObjectHideFlags: 0

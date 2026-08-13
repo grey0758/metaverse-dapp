@@ -11,7 +11,8 @@ namespace MetaverseGame.Bootstrap
     public sealed class CameraLookSurface : MonoBehaviour,
         IPointerDownHandler,
         IDragHandler,
-        IPointerUpHandler
+        IPointerUpHandler,
+        ICancelHandler
     {
         private const int NoPointer = int.MinValue;
 
@@ -37,6 +38,7 @@ namespace MetaverseGame.Bootstrap
             }
 
             activePointerId = eventData.pointerId;
+            eventData.useDragThreshold = false;
         }
 
         public void OnDrag(PointerEventData eventData)
@@ -49,7 +51,17 @@ namespace MetaverseGame.Bootstrap
 
         public void OnPointerUp(PointerEventData eventData)
         {
-            if (eventData.pointerId == activePointerId)
+            ReleasePointer(eventData.pointerId);
+        }
+
+        public void OnCancel(BaseEventData eventData)
+        {
+            activePointerId = NoPointer;
+        }
+
+        private void ReleasePointer(int pointerId)
+        {
+            if (pointerId == activePointerId)
             {
                 activePointerId = NoPointer;
             }

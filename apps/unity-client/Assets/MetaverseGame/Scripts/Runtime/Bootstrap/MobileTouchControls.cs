@@ -22,7 +22,6 @@ namespace MetaverseGame.Bootstrap
         private static readonly Color ActionPressed = new(1f, 0.7f, 0.2f, 1f);
         private static readonly Color ViewActive = new(0.19f, 0.72f, 0.82f, 0.95f);
         private static readonly Color ViewInactive = new(0.025f, 0.06f, 0.10f, 0.92f);
-        private static readonly Color ViewSurface = new(0.19f, 0.91f, 1f, 0.07f);
 
         [SerializeField] private Vector2 referenceResolution = new(1280f, 720f);
         [SerializeField, Range(0f, 0.45f)] private float joystickDeadzone = 0.12f;
@@ -108,7 +107,7 @@ namespace MetaverseGame.Bootstrap
 
             Sprite circleSprite = CreateCircleSprite(128);
             CreateJoystick(inputRouter, circleSprite);
-            CreateLookSurface(circleSprite);
+            CreateLookSurface();
             CreateActionButton(inputRouter, circleSprite);
             CreateCameraModeSelector();
         }
@@ -194,7 +193,7 @@ namespace MetaverseGame.Bootstrap
             buttonText.fontStyle = FontStyle.Bold;
         }
 
-        private void CreateLookSurface(Sprite circleSprite)
+        private void CreateLookSurface()
         {
             GameObject zoneObject = CreateRectObject("Camera Look Zone", safeAreaRoot);
             RectTransform zoneRect = zoneObject.GetComponent<RectTransform>();
@@ -211,28 +210,6 @@ namespace MetaverseGame.Bootstrap
                 FindFirstObjectByType<FollowLocalPlayer>();
             CameraLookSurface lookSurface = zoneObject.AddComponent<CameraLookSurface>();
             lookSurface.Configure(cameraController);
-
-            GameObject reticleObject = CreateRectObject(
-                "Camera Look Reticle",
-                zoneRect);
-            RectTransform reticleRect = reticleObject.GetComponent<RectTransform>();
-            AnchorAt(reticleRect, new Vector2(0.78f, 0.38f), Vector2.zero);
-            reticleRect.sizeDelta = new Vector2(108f, 108f);
-            Image reticle = reticleObject.AddComponent<Image>();
-            reticle.sprite = circleSprite;
-            reticle.color = ViewSurface;
-            reticle.raycastTarget = false;
-            AddOutline(reticle, new Color(Cyan.r, Cyan.g, Cyan.b, 0.28f), 2f);
-
-            GameObject crosshairObject = CreateRectObject(
-                "Camera Look Crosshair",
-                reticleRect);
-            RectTransform crosshairRect = crosshairObject.GetComponent<RectTransform>();
-            Stretch(crosshairRect, 44f);
-            Image crosshair = crosshairObject.AddComponent<Image>();
-            crosshair.color = new Color(Cyan.r, Cyan.g, Cyan.b, 0.55f);
-            crosshair.raycastTarget = false;
-            AddOutline(crosshair, new Color(1f, 1f, 1f, 0.3f), 1f);
         }
 
         private void CreateCameraModeSelector()
@@ -252,7 +229,7 @@ namespace MetaverseGame.Bootstrap
             Text label = CreateText(
                 "View Label",
                 panelRect,
-                "VIEW",
+                "CAM",
                 16,
                 new Color(0.74f, 0.84f, 0.92f, 1f),
                 TextAnchor.MiddleLeft);

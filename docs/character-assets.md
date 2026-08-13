@@ -2,13 +2,18 @@
 
 ## Runtime Character
 
-The default player visual is `character-j.fbx` from Kenney's official
+The default player visual is `character-q.fbx` from Kenney's official
 [Blocky Characters](https://www.kenney.nl/assets/blocky-characters) package.
 The package is marked CC0 1.0 in the included `Kenney-Blocky-Characters-
 License.txt`; the source archive also documents 27 animations per character,
 including `idle` and `walk`. The model is loaded at runtime below
 `NetworkPlayer` so network ownership, transform replication, and the
 `CharacterController` remain on the root object.
+
+`character-q` was selected from the package's official per-character preview:
+it is the formal black-suit, white-shirt, red-tie variant. The earlier
+`character-j` candidate is a uniformed police character and is no longer used
+as the boardroom default.
 
 Kenney was retained after checking current community asset options because it
 combines an explicit CC0 license, low-poly mobile geometry, one compact texture
@@ -20,8 +25,8 @@ redistribution contract for a bundled default character.
 
 | Asset | Source | SHA-256 | Runtime role |
 |---|---|---|---|
-| `character-j.fbx` | Kenney Blocky Characters 2.0, official download | `05f192a180a8988043c04d5567d3249ea50b5bbce53cf913c6b16692d3beabea` | Business-attire low-poly player |
-| `Textures/texture-j.png` | Same package | `11b6625d2d3119c9340fe93095374c45687be00fc7d1256c1f8db7d78cd7b531` | Imported character atlas |
+| `character-q.fbx` | Kenney Blocky Characters 2.0, official download | `d6417d8ee0fe8d02386e2c0a144642cd3d1abeb1b9832f4c5d804f3b31faff0d` | Formal-suit low-poly player |
+| `Textures/texture-q.png` | Same package | `bf220bbc945072a4fce31118b6585207445ddac1c2836b350d10fe0d49fed5ca` | Imported character atlas |
 
 The visual component plays the imported legacy `idle` and `walk` clips based
 on replicated movement, normalizes the model to a two-meter gameplay height,

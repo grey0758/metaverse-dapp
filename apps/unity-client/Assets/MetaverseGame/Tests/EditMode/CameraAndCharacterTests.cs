@@ -52,12 +52,17 @@ namespace MetaverseGame.Tests
             try
             {
                 float lockedPitch = controller.CurrentPitch;
-                controller.ApplyLookDelta(new Vector2(80f, 40f));
+                float lockedYaw = controller.TargetYaw;
+                Assert.That(controller.ApplyLookDelta(new Vector2(80f, 40f)), Is.False);
                 Assert.That(controller.CurrentPitch, Is.EqualTo(lockedPitch));
+                Assert.That(controller.TargetYaw, Is.EqualTo(lockedYaw));
+                Assert.That(controller.LookInputRevision, Is.Zero);
 
                 controller.SetViewMode(FollowLocalPlayer.ViewMode.Free);
-                controller.ApplyLookDelta(new Vector2(80f, 40f));
+                Assert.That(controller.ApplyLookDelta(new Vector2(80f, 40f)), Is.True);
                 Assert.That(controller.CurrentPitch, Is.LessThan(lockedPitch));
+                Assert.That(controller.TargetYaw, Is.GreaterThan(lockedYaw));
+                Assert.That(controller.LookInputRevision, Is.EqualTo(1));
             }
             finally
             {
@@ -78,12 +83,18 @@ namespace MetaverseGame.Tests
 
             try
             {
-                PointerEventData first = new(null) { pointerId = 21, position = Vector2.zero };
+                PointerEventData first = new(null)
+                {
+                    pointerId = 21,
+                    position = Vector2.zero,
+                    useDragThreshold = true,
+                };
                 PointerEventData second = new(null) { pointerId = 22, position = Vector2.zero };
 
                 surface.OnPointerDown(first);
                 surface.OnPointerDown(second);
                 Assert.That(surface.IsActive, Is.True);
+                Assert.That(first.useDragThreshold, Is.False);
 
                 surface.OnPointerUp(second);
                 Assert.That(surface.IsActive, Is.True);
@@ -98,9 +109,80 @@ namespace MetaverseGame.Tests
         }
 
         [Test]
+        public void LookSurfaceDragChangesOrbitAndCancelReleasesPointer()
+        {
+            GameObject cameraObject = new("Camera");
+            GameObject surfaceObject = new("Look Surface");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            FollowLocalPlayer controller = cameraObject.AddComponent<FollowLocalPlayer>();
+            CameraLookSurface surface = surfaceObject.AddComponent<CameraLookSurface>();
+            controller.SetViewMode(FollowLocalPlayer.ViewMode.Free);
+            surface.Configure(controller);
+
+            try
+            {
+                float yawBefore = controller.TargetYaw;
+                float pitchBefore = controller.CurrentPitch;
+                PointerEventData pointer = new(null)
+                {
+                    pointerId = 31,
+                    position = new Vector2(900f, 360f),
+                    delta = new Vector2(-120f, 55f),
+                };
+
+                surface.OnPointerDown(pointer);
+                surface.OnDrag(pointer);
+
+                Assert.That(controller.TargetYaw, Is.LessThan(yawBefore));
+                Assert.That(controller.CurrentPitch, Is.LessThan(pitchBefore));
+                Assert.That(controller.LookInputRevision, Is.EqualTo(1));
+                Assert.That(surface.IsActive, Is.True);
+
+                surface.OnCancel(pointer);
+                Assert.That(surface.IsActive, Is.False);
+            }
+            finally
+            {
+                Object.DestroyImmediate(surfaceObject);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
+        public void LookSurfaceDoesNotCapturePointerWhileCameraIsLocked()
+        {
+            GameObject cameraObject = new("Camera");
+            GameObject surfaceObject = new("Look Surface");
+            Camera camera = cameraObject.AddComponent<Camera>();
+            FollowLocalPlayer controller = cameraObject.AddComponent<FollowLocalPlayer>();
+            CameraLookSurface surface = surfaceObject.AddComponent<CameraLookSurface>();
+            surface.Configure(controller);
+
+            try
+            {
+                PointerEventData pointer = new(null)
+                {
+                    pointerId = 41,
+                    delta = new Vector2(120f, 30f),
+                };
+
+                surface.OnPointerDown(pointer);
+                surface.OnDrag(pointer);
+
+                Assert.That(surface.IsActive, Is.False);
+                Assert.That(controller.LookInputRevision, Is.Zero);
+            }
+            finally
+            {
+                Object.DestroyImmediate(surfaceObject);
+                Object.DestroyImmediate(cameraObject);
+            }
+        }
+
+        [Test]
         public void CommunityCharacterResourceIncludesIdleAndWalkAnimations()
         {
-            const string resourcePath = "Characters/character-j";
+            const string resourcePath = "Characters/character-q";
             GameObject character = Resources.Load<GameObject>(resourcePath);
             AnimationClip[] clips = Resources.LoadAll<AnimationClip>(resourcePath);
 
@@ -122,7 +204,7 @@ namespace MetaverseGame.Tests
                 Assert.That(visual.UsesCommunityModel, Is.True);
                 Assert.That(visual.HasCommunityAnimation, Is.True);
                 Assert.That(visual.VisualRoot, Is.Not.Null);
-                Transform model = visual.VisualRoot.Find("Kenney Blocky Character J");
+                Transform model = visual.VisualRoot.Find("Kenney Blocky Character Q");
                 Assert.That(model, Is.Not.Null);
                 Animation animation = model.GetComponentInChildren<Animation>(true);
                 Assert.That(animation, Is.Not.Null);

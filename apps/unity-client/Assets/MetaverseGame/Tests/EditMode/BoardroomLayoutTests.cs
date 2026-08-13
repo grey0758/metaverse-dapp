@@ -10,13 +10,17 @@ namespace MetaverseGame.Tests
         [Test]
         public void PlatoRoomLayoutMatchesReferenceComposition()
         {
-            Assert.That(BoardroomEnvironment.ConferenceTableCount, Is.EqualTo(3));
-            Assert.That(BoardroomEnvironment.SeatsPerTableSide, Is.EqualTo(7));
+            Assert.That(BoardroomEnvironment.ConferenceTableCount, Is.EqualTo(4));
+            Assert.That(BoardroomEnvironment.SeatsPerTableSide, Is.EqualTo(8));
             Assert.That(BoardroomEnvironment.WindowBayCount, Is.EqualTo(5));
             Assert.That(BoardroomEnvironment.AcousticSlatCount, Is.EqualTo(72));
             Assert.That(BoardroomEnvironment.RoomHalfWidth, Is.EqualTo(7.6f));
             Assert.That(BoardroomEnvironment.RoomHalfLength, Is.EqualTo(12f));
             Assert.That(BoardroomEnvironment.RoomCeilingHeight, Is.EqualTo(4f));
+            Assert.That(BoardroomEnvironment.ConferenceTableWidth, Is.EqualTo(11.1f));
+            Assert.That(BoardroomEnvironment.ConferenceTableDepth, Is.EqualTo(0.92f));
+            Assert.That(BoardroomEnvironment.ConferenceTableHeight, Is.EqualTo(0.79f));
+            Assert.That(BoardroomEnvironment.ConferenceChairWidth, Is.EqualTo(0.72f));
             Assert.That(
                 BoardroomEnvironment.StrategyDisplayWidth /
                     BoardroomEnvironment.StrategyDisplayHeight,
@@ -49,12 +53,15 @@ namespace MetaverseGame.Tests
             Vector3 spawn = NetworkPlayerController.ResolveSpawnPosition(0);
             Vector3 cameraPosition = FollowLocalPlayer.CalculateOrbitPosition(
                 spawn,
-                0f,
+                FollowLocalPlayer.DefaultLockedYawOffset,
                 FollowLocalPlayer.DefaultPitch,
                 FollowLocalPlayer.DefaultDistance);
 
             Assert.That(spawn.x, Is.LessThan(-5.5f));
-            Assert.That(cameraPosition.x, Is.EqualTo(spawn.x).Within(0.0001f));
+            Assert.That(cameraPosition.x, Is.LessThan(spawn.x));
+            Assert.That(
+                Mathf.Abs(cameraPosition.x),
+                Is.LessThan(BoardroomEnvironment.RoomHalfWidth - 0.5f));
             Assert.That(
                 cameraPosition.z,
                 Is.GreaterThan(-BoardroomEnvironment.RoomHalfLength + 0.5f));

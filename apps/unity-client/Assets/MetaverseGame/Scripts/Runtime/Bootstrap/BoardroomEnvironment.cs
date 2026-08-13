@@ -13,13 +13,17 @@ namespace MetaverseGame.Bootstrap
         private const string SmokedWalnutResource = "Boardroom/SmokedWalnut";
         private const string StrategyDisplayResource = "Boardroom/StrategyDisplay";
 
-        public const int ConferenceTableCount = 3;
-        public const int SeatsPerTableSide = 7;
+        public const int ConferenceTableCount = 4;
+        public const int SeatsPerTableSide = 8;
         public const int WindowBayCount = 5;
         public const int AcousticSlatCount = 72;
         public const float RoomHalfWidth = 7.6f;
         public const float RoomHalfLength = 12f;
         public const float RoomCeilingHeight = 4f;
+        public const float ConferenceTableWidth = 11.1f;
+        public const float ConferenceTableDepth = 0.92f;
+        public const float ConferenceTableHeight = 0.79f;
+        public const float ConferenceChairWidth = 0.72f;
         public const float StrategyDisplayWidth = 6.2f;
         public const float StrategyDisplayHeight = StrategyDisplayWidth * 9f / 16f;
 
@@ -37,6 +41,9 @@ namespace MetaverseGame.Bootstrap
         private Material windowGlassMaterial;
         private Material metalMaterial;
         private Material brassMaterial;
+        private Material cityMaterial;
+        private Material bannerRedMaterial;
+        private Material bannerWhiteMaterial;
         private Material leatherMaterial;
         private Material chairFrameMaterial;
         private Material chairMeshMaterial;
@@ -162,6 +169,25 @@ namespace MetaverseGame.Bootstrap
                 new Color(0.58f, 0.42f, 0.22f),
                 0.5f,
                 0.58f);
+            cityMaterial = CreateMaterial(
+                "Window City Silhouette",
+                new Color(0.28f, 0.34f, 0.36f),
+                0.04f,
+                0.16f);
+            bannerRedMaterial = CreateMaterial(
+                "Ceremonial Banner Red",
+                new Color(0.72f, 0.035f, 0.045f),
+                0f,
+                0.24f,
+                fabricTexture,
+                new Vector2(2f, 5f));
+            bannerWhiteMaterial = CreateMaterial(
+                "Ceremonial Banner White",
+                new Color(0.92f, 0.91f, 0.86f),
+                0f,
+                0.2f,
+                fabricTexture,
+                new Vector2(2f, 5f));
             leatherMaterial = CreateMaterial(
                 "Black Mesh Chair Fabric",
                 new Color(0.035f, 0.045f, 0.055f),
@@ -346,7 +372,8 @@ namespace MetaverseGame.Bootstrap
                 new Vector3(14.8f, 0.4f, 0.14f),
                 acousticBlueMaterial);
 
-            // Left-side window bays are intentionally open, like the reference room.
+            // The reference room uses full-height glazing with mostly lowered
+            // roller blinds and a narrow city view below them.
             CreateBox(
                 "Window Header",
                 new Vector3(-7.32f, 3.52f, 0f),
@@ -360,16 +387,22 @@ namespace MetaverseGame.Bootstrap
             foreach (float z in new[] { -8.8f, -4.4f, 0f, 4.4f, 8.8f })
             {
                 CreateBox(
+                    "Window Daylight Panel",
+                    new Vector3(-7.43f, 1.86f, z),
+                    new Vector3(0.025f, 3.08f, 3.96f),
+                    windowDaylightMaterial);
+                CreateBox(
                     "Window Glass",
                     new Vector3(-7.22f, 1.86f, z),
                     new Vector3(0.04f, 3.18f, 4.05f),
                     windowGlassMaterial);
                 CreateBox(
-                    "Window Daylight Panel",
-                    new Vector3(-7.17f, 1.86f, z),
-                    new Vector3(0.025f, 2.98f, 3.82f),
-                    windowDaylightMaterial);
+                    "Window Roller Blind",
+                    new Vector3(-7.18f, 2.55f, z),
+                    new Vector3(0.025f, 1.72f, 3.78f),
+                    ceilingMaterial);
             }
+            BuildWindowCitySilhouette();
             foreach (float z in new[] { -11f, -6.6f, -2.2f, 2.2f, 6.6f, 11f })
             {
                 CreateBox(
@@ -389,6 +422,25 @@ namespace MetaverseGame.Bootstrap
                 new Vector3(0f, 1.86f, 11.66f),
                 new Vector3(14.75f, 3.28f, 0.12f),
                 acousticBlueMaterial);
+
+            CreateBox(
+                "North Display Lower Wood Wall",
+                new Vector3(0f, 0.57f, 11.48f),
+                new Vector3(7.05f, 0.92f, 0.11f),
+                walnutMaterial);
+            foreach (float x in new[] { -5.25f, 5.25f })
+            {
+                CreateBox(
+                    "North Acoustic Panel Joint",
+                    new Vector3(x, 1.86f, 11.47f),
+                    new Vector3(0.055f, 3.18f, 0.08f),
+                    metalMaterial);
+                CreateBox(
+                    "North Acoustic Panel Joint",
+                    new Vector3(x + Mathf.Sign(x) * 1.5f, 1.86f, 11.47f),
+                    new Vector3(0.055f, 3.18f, 0.08f),
+                    metalMaterial);
+            }
 
             CreateBox(
                 "East Acoustic Wall Backing South",
@@ -440,50 +492,134 @@ namespace MetaverseGame.Bootstrap
                 metalMaterial);
 
             CreateBox(
-                "North Display Lower Wood Band",
-                new Vector3(0f, 0.58f, 11.54f),
-                new Vector3(6.9f, 0.78f, 0.12f),
-                walnutMaterial);
-
-            CreateBox(
                 "Strategy Display Frame",
-                new Vector3(0f, 1.95f, 11.48f),
+                new Vector3(0f, 2.18f, 11.34f),
                 new Vector3(6.58f, 3.72f, 0.15f),
                 metalMaterial);
             CreateBox(
                 "Strategy Display",
-                new Vector3(0f, 1.95f, 11.38f),
+                new Vector3(0f, 2.18f, 11.24f),
                 new Vector3(StrategyDisplayWidth, StrategyDisplayHeight, 0.045f),
                 displayMaterial);
             CreateBox(
                 "Display Lower Vent",
-                new Vector3(0f, 0.86f, 11.3f),
+                new Vector3(0f, 0.36f, 11.26f),
                 new Vector3(6.2f, 0.06f, 0.08f),
                 metalMaterial);
             CreateBox(
                 "Display Camera Bar",
-                new Vector3(0f, 3.66f, 11.3f),
+                new Vector3(0f, 3.78f, 11.2f),
                 new Vector3(1.1f, 0.09f, 0.09f),
                 metalMaterial);
             CreateSphere(
                 "Display Camera Lens",
-                new Vector3(0f, 3.66f, 11.23f),
+                new Vector3(0f, 3.78f, 11.13f),
                 new Vector3(0.08f, 0.08f, 0.05f),
                 cyanLightMaterial);
+
+            BuildFrontCeremonialBanners();
+            BuildFrontSpeakers();
 
             CreateCeilingGrid();
         }
 
+        private void BuildWindowCitySilhouette()
+        {
+            float[] centers = { -10.55f, -9.65f, -8.45f, -7.15f, -5.8f, -4.65f,
+                -3.25f, -1.85f, -0.4f, 1.05f, 2.4f, 3.8f, 5.25f, 6.6f, 8.05f, 9.5f, 10.55f };
+            float[] heights = { 0.72f, 1.18f, 0.9f, 1.42f, 0.82f, 1.12f,
+                1.5f, 0.98f, 1.24f, 0.76f, 1.34f, 1.05f, 1.48f, 0.88f, 1.18f, 1.38f, 0.84f };
+            float[] widths = { 0.62f, 0.78f, 0.95f, 0.68f, 1.02f, 0.72f,
+                0.84f, 1.08f, 0.76f, 0.92f, 0.64f, 1.04f, 0.7f, 0.9f, 0.78f, 0.68f, 0.76f };
+
+            for (int index = 0; index < centers.Length; index++)
+            {
+                float height = heights[index];
+                CreateBox(
+                    "Window City Building",
+                    new Vector3(-7.39f, height * 0.5f + 0.18f, centers[index]),
+                    new Vector3(0.025f, height, widths[index]),
+                    cityMaterial);
+            }
+        }
+
+        private void BuildFrontCeremonialBanners()
+        {
+            float[] polePositions = { -5.72f, -4.86f, -4f, 4.52f, 5.38f };
+            Material[] bannerMaterials =
+            {
+                bannerRedMaterial,
+                acousticBlueMaterial,
+                bannerRedMaterial,
+                acousticBlueMaterial,
+                bannerWhiteMaterial,
+            };
+
+            for (int index = 0; index < polePositions.Length; index++)
+            {
+                float x = polePositions[index];
+                CreateCylinder(
+                    "Ceremonial Banner Pole",
+                    new Vector3(x, 1.76f, 10.96f),
+                    new Vector3(0.026f, 1.5f, 0.026f),
+                    brassMaterial);
+                CreateCylinder(
+                    "Ceremonial Banner Base",
+                    new Vector3(x, 0.08f, 10.96f),
+                    new Vector3(0.24f, 0.035f, 0.24f),
+                    brassMaterial);
+                CreateSphere(
+                    "Ceremonial Banner Finial",
+                    new Vector3(x, 3.34f, 10.96f),
+                    new Vector3(0.075f, 0.075f, 0.075f),
+                    brassMaterial);
+                CreateBox(
+                    "Ceremonial Banner Field",
+                    new Vector3(x + 0.22f, 2.38f, 10.93f),
+                    new Vector3(0.42f, 1.62f, 0.028f),
+                    bannerMaterials[index]);
+
+                if (bannerMaterials[index] == bannerRedMaterial)
+                {
+                    CreateBox(
+                        "Ceremonial Banner Accent",
+                        new Vector3(x + 0.22f, 2.38f, 10.9f),
+                        new Vector3(0.08f, 1.56f, 0.015f),
+                        bannerWhiteMaterial);
+                }
+            }
+        }
+
+        private void BuildFrontSpeakers()
+        {
+            foreach (float x in new[] { -6.72f, 6.72f })
+            {
+                CreateBox(
+                    "Front Wall Speaker Cabinet",
+                    new Vector3(x, 3.38f, 10.98f),
+                    new Vector3(0.82f, 0.48f, 0.42f),
+                    metalMaterial);
+                CreateBox(
+                    "Front Wall Speaker Grille",
+                    new Vector3(x, 3.38f, 10.74f),
+                    new Vector3(0.7f, 0.37f, 0.035f),
+                    chairMeshMaterial);
+                CreateSphere(
+                    "Front Wall Speaker Driver",
+                    new Vector3(x, 3.38f, 10.71f),
+                    new Vector3(0.2f, 0.2f, 0.035f),
+                    chairFrameMaterial);
+            }
+        }
+
         private void BuildConferenceArea()
         {
-            const float tableWidth = 11.6f;
-            const float tableDepth = 1.35f;
-            float[] tableCenters = { -7.0f, -3.35f, 0.3f };
+            float[] tableCenters = { -7.2f, -4.05f, -0.9f, 2.25f };
 
             CreateBox(
                 "Conference Carpet Focus",
-                new Vector3(0f, 0.035f, -2.8f),
-                new Vector3(14.2f, 0.055f, 18.4f),
+                new Vector3(0f, 0.035f, -2.45f),
+                new Vector3(14.2f, 0.055f, 19.1f),
                 rugMaterial);
 
             for (int row = 0; row < tableCenters.Length; row++)
@@ -493,61 +629,73 @@ namespace MetaverseGame.Bootstrap
 
                 CreateBox(
                     $"{rowName} Edge",
-                    new Vector3(0f, 0.83f, z),
-                    new Vector3(tableWidth + 0.16f, 0.16f, tableDepth + 0.16f),
-                    metalMaterial,
-                    true);
+                    new Vector3(0f, ConferenceTableHeight - 0.055f, z),
+                    new Vector3(
+                        ConferenceTableWidth + 0.08f,
+                        0.09f,
+                        ConferenceTableDepth + 0.08f),
+                    metalMaterial);
                 CreateBox(
                     $"{rowName} Honey Oak Top",
-                    new Vector3(0f, 0.94f, z),
-                    new Vector3(tableWidth, 0.16f, tableDepth),
+                    new Vector3(0f, ConferenceTableHeight, z),
+                    new Vector3(ConferenceTableWidth, 0.1f, ConferenceTableDepth),
                     walnutMaterial,
                     true);
                 CreateBox(
                     $"{rowName} Modesty Panel",
-                    new Vector3(0f, 0.48f, z),
-                    new Vector3(tableWidth - 0.32f, 0.62f, 0.09f),
+                    new Vector3(0f, 0.47f, z + 0.34f),
+                    new Vector3(ConferenceTableWidth - 0.44f, 0.48f, 0.055f),
                     chairFrameMaterial,
                     true);
-                foreach (float x in new[] { -4.95f, 4.95f })
+                foreach (float x in new[] { -4.82f, 4.82f })
                 {
                     CreateBox(
                         $"{rowName} Leg",
-                        new Vector3(x, 0.42f, z),
-                        new Vector3(0.14f, 0.72f, 0.84f),
+                        new Vector3(x, 0.39f, z),
+                        new Vector3(0.1f, 0.68f, 0.62f),
                         metalMaterial,
                         true);
                 }
 
                 CreateBox(
                     $"{rowName} Center Control",
-                    new Vector3(0f, 1.045f, z),
-                    new Vector3(0.52f, 0.045f, 0.22f),
+                    new Vector3(0f, ConferenceTableHeight + 0.065f, z),
+                    new Vector3(0.42f, 0.03f, 0.16f),
                     cyanLightMaterial);
 
                 for (int seat = 0; seat < SeatsPerTableSide; seat++)
                 {
-                    float x = -4.5f + seat * 1.5f;
-                    CreateChair(new Vector3(x, 0f, z - 1.48f), 0f);
+                    float x = -4.55f + seat * 1.3f;
+                    CreateChair(new Vector3(x, 0f, z - 1.18f), 0f);
                 }
             }
 
             CreateBox(
                 "Presenter Podium",
-                new Vector3(-6.15f, 0.58f, 8.85f),
-                new Vector3(1.15f, 1.05f, 0.78f),
+                new Vector3(-6.15f, 0.53f, 8.85f),
+                new Vector3(0.9f, 0.94f, 0.66f),
                 slatMaterial,
                 true);
             CreateBox(
                 "Presenter Podium Top",
-                new Vector3(-6.15f, 1.14f, 8.85f),
-                new Vector3(1.3f, 0.08f, 0.9f),
+                new Vector3(-6.15f, 1.04f, 8.85f),
+                new Vector3(1.02f, 0.07f, 0.76f),
                 walnutMaterial);
             CreateBox(
                 "Presenter Podium Light",
-                new Vector3(-6.15f, 0.76f, 8.42f),
-                new Vector3(0.72f, 0.05f, 0.035f),
+                new Vector3(-6.15f, 0.7f, 8.5f),
+                new Vector3(0.58f, 0.04f, 0.03f),
                 cyanLightMaterial);
+            CreateCylinder(
+                "Presenter Microphone Stem",
+                new Vector3(-6.36f, 1.29f, 8.7f),
+                new Vector3(0.025f, 0.25f, 0.025f),
+                metalMaterial);
+            CreateSphere(
+                "Presenter Microphone Head",
+                new Vector3(-6.36f, 1.55f, 8.7f),
+                new Vector3(0.06f, 0.08f, 0.06f),
+                metalMaterial);
         }
 
         private void BuildArrivalLounge()
@@ -571,27 +719,27 @@ namespace MetaverseGame.Bootstrap
 
         private void BuildLightFixtures()
         {
-            foreach (float z in new[] { -8.1f, -4.5f, -0.9f, 2.7f, 6.3f })
+            foreach (float z in new[] { -8.9f, -5.55f, -2.2f, 1.15f, 4.5f, 7.85f })
             {
                 CreateBox(
                     "Recessed Ceiling Light",
-                    new Vector3(0f, 3.83f, z),
-                    new Vector3(8.8f, 0.045f, 1.02f),
+                    new Vector3(0f, 3.88f, z),
+                    new Vector3(8.45f, 0.035f, 0.58f),
                     warmLightMaterial);
                 CreateBox(
                     "Ceiling Light Long Edge",
-                    new Vector3(0f, 3.78f, z - 0.57f),
-                    new Vector3(8.95f, 0.06f, 0.05f),
+                    new Vector3(0f, 3.84f, z - 0.33f),
+                    new Vector3(8.55f, 0.045f, 0.035f),
                     metalMaterial);
                 CreateBox(
                     "Ceiling Light Short Edge",
-                    new Vector3(-4.45f, 3.78f, z),
-                    new Vector3(0.05f, 0.06f, 1.08f),
+                    new Vector3(-4.25f, 3.84f, z),
+                    new Vector3(0.035f, 0.045f, 0.64f),
                     metalMaterial);
                 CreateBox(
                     "Ceiling Light Short Edge",
-                    new Vector3(4.45f, 3.78f, z),
-                    new Vector3(0.05f, 0.06f, 1.08f),
+                    new Vector3(4.25f, 3.84f, z),
+                    new Vector3(0.035f, 0.045f, 0.64f),
                     metalMaterial);
             }
 
@@ -606,10 +754,11 @@ namespace MetaverseGame.Bootstrap
                 new Vector3(8.8f, 0.055f, 0.12f),
                 warmLightMaterial);
 
-            CreatePointLight("Table Light South", new Vector3(0f, 3.35f, -7.0f), 7.5f, 1.45f);
-            CreatePointLight("Table Light Center", new Vector3(0f, 3.35f, -3.35f), 7.5f, 1.45f);
-            CreatePointLight("Table Light North", new Vector3(0f, 3.35f, 0.3f), 7.5f, 1.45f);
-            CreatePointLight("Rear Light", new Vector3(0f, 3.35f, 7.8f), 7.5f, 1.3f);
+            CreatePointLight("Table Light South", new Vector3(0f, 3.35f, -7.2f), 7.2f, 1.25f);
+            CreatePointLight("Table Light Center South", new Vector3(0f, 3.35f, -4.05f), 7.2f, 1.2f);
+            CreatePointLight("Table Light Center North", new Vector3(0f, 3.35f, -0.9f), 7.2f, 1.2f);
+            CreatePointLight("Table Light North", new Vector3(0f, 3.35f, 2.25f), 7.2f, 1.2f);
+            CreatePointLight("Front Light", new Vector3(0f, 3.35f, 8f), 7.5f, 1.15f);
         }
 
         private void CreateCeilingGrid()
@@ -644,77 +793,77 @@ namespace MetaverseGame.Bootstrap
 
             CreateBox(
                 "Chair Seat",
-                new Vector3(0f, 0.56f, 0f),
-                new Vector3(0.94f, 0.16f, 0.86f),
+                new Vector3(0f, 0.49f, 0f),
+                new Vector3(ConferenceChairWidth, 0.12f, 0.68f),
                 chairMeshMaterial,
                 true,
                 chair.transform);
             CreateBox(
                 "Chair Back",
-                new Vector3(0f, 1.08f, -0.43f),
-                new Vector3(0.96f, 1.04f, 0.11f),
+                new Vector3(0f, 0.94f, -0.35f),
+                new Vector3(ConferenceChairWidth + 0.04f, 0.86f, 0.075f),
                 chairMeshMaterial,
                 parent: chair.transform);
             CreateBox(
                 "Chair Back Top Rail",
-                new Vector3(0f, 1.59f, -0.51f),
-                new Vector3(1.08f, 0.08f, 0.045f),
+                new Vector3(0f, 1.36f, -0.4f),
+                new Vector3(ConferenceChairWidth + 0.1f, 0.055f, 0.035f),
                 chairFrameMaterial,
                 parent: chair.transform);
             CreateBox(
                 "Chair Back Bottom Rail",
-                new Vector3(0f, 0.57f, -0.51f),
-                new Vector3(1.08f, 0.08f, 0.045f),
+                new Vector3(0f, 0.51f, -0.4f),
+                new Vector3(ConferenceChairWidth + 0.1f, 0.055f, 0.035f),
                 chairFrameMaterial,
                 parent: chair.transform);
-            foreach (float x in new[] { -0.5f, 0.5f })
+            foreach (float x in new[] { -0.39f, 0.39f })
             {
                 CreateBox(
                     "Chair Back Side Rail",
-                    new Vector3(x, 1.08f, -0.51f),
-                    new Vector3(0.08f, 1.08f, 0.045f),
+                    new Vector3(x, 0.94f, -0.4f),
+                    new Vector3(0.055f, 0.9f, 0.035f),
                     chairFrameMaterial,
                     parent: chair.transform);
             }
             CreateCylinder(
                 "Chair Pedestal",
-                new Vector3(0f, 0.28f, 0f),
-                new Vector3(0.1f, 0.27f, 0.1f),
+                new Vector3(0f, 0.25f, 0f),
+                new Vector3(0.07f, 0.23f, 0.07f),
                 chairFrameMaterial,
                 parent: chair.transform);
             CreateCylinder(
                 "Chair Base",
-                new Vector3(0f, 0.045f, 0f),
-                new Vector3(0.42f, 0.035f, 0.42f),
+                new Vector3(0f, 0.04f, 0f),
+                new Vector3(0.34f, 0.03f, 0.34f),
                 chairFrameMaterial,
                 parent: chair.transform);
-            foreach (float x in new[] { -0.53f, 0.53f })
+            foreach (float x in new[] { -0.43f, 0.43f })
             {
                 CreateBox(
                     "Chair Arm",
-                    new Vector3(x, 0.78f, 0f),
-                    new Vector3(0.055f, 0.08f, 0.68f),
+                    new Vector3(x, 0.69f, 0f),
+                    new Vector3(0.045f, 0.06f, 0.54f),
                     chairFrameMaterial,
                     parent: chair.transform);
                 CreateBox(
                     "Chair Arm Pad",
-                    new Vector3(x, 0.86f, 0f),
-                    new Vector3(0.16f, 0.055f, 0.48f),
+                    new Vector3(x, 0.76f, 0f),
+                    new Vector3(0.12f, 0.045f, 0.4f),
                     chairMeshMaterial,
                     parent: chair.transform);
             }
-            foreach (float x in new[] { -0.31f, 0.31f })
+            foreach (float x in new[] { -0.26f, 0.26f })
             {
                 CreateBox(
                     "Chair Wheel Stem",
-                    new Vector3(x, 0.12f, 0f),
-                    new Vector3(0.055f, 0.055f, 0.68f),
+                    new Vector3(x, 0.1f, 0f),
+                    new Vector3(0.045f, 0.045f, 0.54f),
                     chairFrameMaterial,
                     parent: chair.transform);
                 CreateSphere(
                     "Chair Caster",
-                    new Vector3(x, 0.055f, x * 0.35f),
-                    new Vector3(0.11f, 0.08f, 0.11f),
+                    new Vector3(x, 0.045f, x * 0.35f),
+                    new Vector3(0.085f, 0.06f, 0.085f),
                     chairFrameMaterial,
                     parent: chair.transform);
             }
