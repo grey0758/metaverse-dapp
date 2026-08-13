@@ -45,12 +45,12 @@ namespace MetaverseGame.Editor
             GameObject camera = new("Main Camera");
             camera.tag = "MainCamera";
             camera.transform.SetPositionAndRotation(
-                new Vector3(0f, 2.7f, -13.8f),
-                Quaternion.Euler(12f, 0f, 0f));
+                new Vector3(-6.35f, 2.9f, -10.98f),
+                Quaternion.Euler(10f, 0f, 0f));
             Camera sceneCamera = camera.AddComponent<Camera>();
             sceneCamera.clearFlags = CameraClearFlags.SolidColor;
             sceneCamera.backgroundColor = new Color(0.035f, 0.055f, 0.06f);
-            sceneCamera.fieldOfView = 60f;
+            sceneCamera.fieldOfView = 64f;
             camera.AddComponent<AudioListener>();
             camera.AddComponent<FollowLocalPlayer>();
 

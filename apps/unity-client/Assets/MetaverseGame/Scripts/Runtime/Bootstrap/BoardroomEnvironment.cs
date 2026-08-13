@@ -246,7 +246,7 @@ namespace MetaverseGame.Bootstrap
             {
                 camera.clearFlags = CameraClearFlags.SolidColor;
                 camera.backgroundColor = new Color(0.68f, 0.75f, 0.78f);
-                camera.fieldOfView = 60f;
+                camera.fieldOfView = 64f;
             }
 
             GameObject sunObject = GameObject.Find("Sun");

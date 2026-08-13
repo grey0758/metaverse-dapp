@@ -42,5 +42,22 @@ namespace MetaverseGame.Tests
                 Assert.That(position.y, Is.EqualTo(1f));
             }
         }
+
+        [Test]
+        public void DefaultSpawnLeavesRoomForTheLockedCameraInsideTheSouthWall()
+        {
+            Vector3 spawn = NetworkPlayerController.ResolveSpawnPosition(0);
+            Vector3 cameraPosition = FollowLocalPlayer.CalculateOrbitPosition(
+                spawn,
+                0f,
+                FollowLocalPlayer.DefaultPitch,
+                FollowLocalPlayer.DefaultDistance);
+
+            Assert.That(spawn.x, Is.LessThan(-5.5f));
+            Assert.That(cameraPosition.x, Is.EqualTo(spawn.x).Within(0.0001f));
+            Assert.That(
+                cameraPosition.z,
+                Is.GreaterThan(-BoardroomEnvironment.RoomHalfLength + 0.5f));
+        }
     }
 }
