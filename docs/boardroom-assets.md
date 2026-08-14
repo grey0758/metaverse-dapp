@@ -22,14 +22,59 @@ The primary client uses the following reviewed derivatives under
 
 | Asset | Runtime size | Visual role | SHA-256 |
 |---|---:|---|---|
-| `carpet.png` | 1024 x 1024 | pale cool-gray room floor | `44d22f6b887fe76966238bef06c8a0d676a29214be70bfab08b4d4078daf6ce4` |
-| `oak.png` | 1024 x 1024 | table and panel surfaces | `a9e8cf255ee82fc0f0d173cffd504610c460a7be463e5df05fc97af27320ac87` |
+| `plato-boardroom-hifi.png` | 2560 x 1440 | complete semi-realistic 2.5D room map | `6bc8f2396af7107452d4a6f8370bebdce2c807fb3563b7b13f5d62286f9f5830` |
 | `plato-display.png` | 2048 x 1152 | authorized room display crop | `974395f57d0ca3c6eedb3b470c5c4def37b63e93ab7e74586460fabc918e7d09` |
 
-`BoardroomArt` combines these bitmap surfaces with code-drawn architecture,
-chairs, planters, windows, banners, lectern, and display framing. Visuals,
-collision rectangles, and navigation obstructions remain separate layers.
-`BoardroomLayout` is the source for the last two.
+`BoardroomArt` renders the complete map at one texture pixel per world unit and
+perspective-maps the authorized display crop into the generated blank screen.
+The display keeps its standby/active highlight interaction. The older
+`carpet.png` and `oak.png` files remain as unreferenced fallback sources for
+the retained procedural treatment; they are not layered over the high-fidelity
+map.
+
+The generated room art is still presentation-only. `BoardroomLayout` owns the
+trapezoid walkable outline, four table obstacle rows, lectern, spawn, and
+interaction points. `BoardroomNavigation` bakes from that data, while physics
+uses the same obstacles plus a closed perimeter collider.
+
+The active character set is under
+`assets/characters/featherfall-business/`. It contains twelve 176 x 216 RGBA
+frames: three walking phases for down, left, up, and right. Its source and
+per-frame hashes are recorded in that directory's `PROVENANCE.md`. The former
+CC0 Kenney frames remain available as an unreferenced low-resolution fallback.
+
+Godot imports the high-resolution room, display, and business character with
+mipmaps; the project canvas filter is linear with mipmaps. This removes the
+nearest-neighbor pixel treatment used by the initial prototype.
+
+### 2026-08-13 Godot generation
+
+- Authorized endpoint: `https://video.opencodex.uk/v1`.
+- Room source model: `gpt-image-2-4k`.
+- Selected room source: 3840 x 2160 PNG, SHA-256
+  `87718ec909f758011b1d2a6a7e6ed7a0fa3ab198a3705a805566d9a993006b77`.
+- Room prompt intent: reproduce the supplied Plato room as a clean, empty,
+  semi-realistic top-down 2.5D game map with four oak table rows, black mesh
+  chairs, left windows, right oak slats, cobalt front wall, five approved
+  ceremonial flags, and a blank presentation screen; exclude people, UI,
+  watermarks, and generated text.
+- Room transformation: reviewed 4K source downsampled with Lanczos filtering to
+  2560 x 1440, metadata stripped, and stored as RGB PNG.
+- Character source model: `gpt-image-2`.
+- Character source: 1254 x 1254 PNG, SHA-256
+  `2f96450d39ff528f5b2be27a8b8fc4501e63e2867bb22e3758c4632f1adbcc78`.
+- Character prompt intent: one consistent adult East Asian business
+  professional in a charcoal suit, arranged as a strict 3 x 4 sheet for three
+  walk phases and four directions on a removable solid magenta background;
+  exclude text, logos, props, extra figures, and pixel-art styling.
+- Character transformation: soft chroma-key matte and despill, deterministic
+  cell split, independent-shadow removal from the three back-facing frames,
+  common 176 x 216 canvas, aligned foot baseline, and stripped metadata.
+
+The user directed and authorized the generated room and character derivatives
+for this project. Provider credentials, raw Plato photographs, generation
+responses, rejected candidates, and source sheets remain outside Git in the
+ignored operations scratch area.
 
 The 2D client has been visually smoked at 1280 x 720 and 960 x 540 on Linux
 X11 software rendering. That proves nonblank composition and responsive HUD

@@ -52,7 +52,7 @@ Boardroom
   MoveTargetMarker         client-only destination feedback
   Player                   CharacterBody2D
     NavigationAgent2D      engine path query and path progression
-    AnimatedSprite2D       replaceable CC0 character frames
+    AnimatedSprite2D       replaceable project-owned character frames
   BoardroomCamera          LOCK/FREE Camera2D behavior
   GameHud                  safe-area touch and status controls
 ```

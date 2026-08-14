@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjse30gae6ags"
-path="res://.godot/imported/plato-display.png-8c21b12824a54614daf3428adc084fe0.ctex"
+uid="uid://cc4iuyw3sjpce"
+path="res://.godot/imported/walk-up-0.png-605ddfeeffb8446a9c1cab9a7d9ace3e.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/boardroom/plato-display.png"
-dest_files=["res://.godot/imported/plato-display.png-8c21b12824a54614daf3428adc084fe0.ctex"]
+source_file="res://assets/characters/featherfall-business/walk-up-0.png"
+dest_files=["res://.godot/imported/walk-up-0.png-605ddfeeffb8446a9c1cab9a7d9ace3e.ctex"]
 
 [params]
 

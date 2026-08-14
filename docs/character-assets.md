@@ -2,28 +2,33 @@
 
 ## Godot 2D primary character
 
-The primary Godot client uses twelve selected 16 x 16 four-direction walking
-frames from Kenney's official RPG Urban Pack 1.0. The package's bundled notice
-marks it Creative Commons Zero (CC0 1.0).
+The primary Godot client uses twelve project-owned 176 x 216 RGBA walking
+frames generated for Featherfall. They depict one consistent adult business
+professional in a charcoal suit, with three phases each for down, left, up,
+and right.
 
-- Source: <https://kenney.nl/assets/rpg-urban-pack>
-- Archive SHA-256:
-  `4541d89d639fc7d1e905dd925e55b1c4977a41d983516228db1d57173bb9afaf`
 - Runtime directory:
-  `apps/godot-client/assets/characters/kenney-rpg-urban/`
-- License copy: `LICENSE.txt` in the same directory
-- Imported subset: three walking frames each for left, right, up, and down
+  `apps/godot-client/assets/characters/featherfall-business/`
+- Source model: `gpt-image-2`
+- Source sheet SHA-256:
+  `2f96450d39ff528f5b2be27a8b8fc4501e63e2867bb22e3758c4632f1adbcc78`
+- Runtime hashes and transformations: `PROVENANCE.md` in the same directory
 
-The selected dark-haired office character is scaled by Godot's
-`AnimatedSprite2D`. `PlayerController` selects direction from movement velocity
-and holds the middle frame while idle. Character art is presentation only;
-the `CharacterBody2D` collision shape and movement controller remain stable
-when the art is replaced.
+`PlayerController` selects direction from movement velocity and holds the
+middle frame while idle. Character art is presentation only; the
+`CharacterBody2D` collision shape and movement controller remain stable when
+the art is replaced. Linear filtering and per-frame mipmaps preserve smooth
+edges at the locked camera's fractional zoom.
 
-This is an explicit first-slice placeholder. Production character work should
-retain the four-direction animation contract or update it deliberately with
-tests, and must include redistribution rights suitable for the repository and
-mobile binaries.
+The previous Kenney RPG Urban Pack subset remains in
+`assets/characters/kenney-rpg-urban/` as an unreferenced low-resolution
+fallback. Its archive SHA-256 is
+`4541d89d639fc7d1e905dd925e55b1c4977a41d983516228db1d57173bb9afaf`,
+and its bundled notice marks it Creative Commons Zero (CC0 1.0).
+
+Future character work should retain the four-direction, three-phase animation
+contract or update it deliberately with tests, and must record source rights
+suitable for the repository and mobile binaries.
 
 ## Retained Unity 3D character
 

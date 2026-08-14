@@ -50,6 +50,11 @@ func _test_project_settings() -> void:
 		"expand",
 		"wide-device stretch aspect"
 	)
+	_expect_equal(
+		ProjectSettings.get_setting("rendering/textures/canvas_textures/default_texture_filter"),
+		2,
+		"high-resolution art uses linear mipmap filtering"
+	)
 	_expect_true(
 		ProjectSettings.get_setting("input_devices/pointing/emulate_touch_from_mouse"),
 		"mouse emulates touch for desktop development"
@@ -62,10 +67,14 @@ func _test_project_settings() -> void:
 
 func _test_layout_contract() -> void:
 	_expect_equal(BoardroomLayout.table_surface_rects().size(), 4, "four Plato table rows")
-	_expect_equal(BoardroomLayout.CHAIR_COUNT_PER_SIDE, 8, "eight chairs per table side")
+	_expect_equal(BoardroomLayout.CHAIR_COUNT_PER_SIDE, 10, "generated room has ten chairs per table side")
 	_expect_true(
 		BoardroomLayout.point_is_walkable(BoardroomLayout.PLAYER_SPAWN),
 		"player spawn is walkable"
+	)
+	_expect_false(
+		BoardroomLayout.point_is_walkable(Vector2(200.0, 340.0)),
+		"trapezoid wall corners are not walkable"
 	)
 	for obstacle in BoardroomLayout.navigation_obstacles():
 		_expect_false(obstacle.has_point(BoardroomLayout.PLAYER_SPAWN), "spawn clears every obstacle")
@@ -141,6 +150,9 @@ func _test_boardroom_scene() -> void:
 	root.size = Vector2i(1280, 720)
 	await process_frame
 	var boardroom := BOARDROOM_SCENE.instantiate() as Boardroom
+	_expect_true(boardroom != null, "boardroom scene has its typed root script")
+	if boardroom == null:
+		return
 	root.add_child(boardroom)
 	await process_frame
 	for _frame in range(5):
@@ -151,13 +163,19 @@ func _test_boardroom_scene() -> void:
 	_expect_true(is_instance_valid(boardroom.hud.virtual_joystick), "scene has community virtual joystick")
 	_expect_equal(
 		boardroom.obstacles.get_child_count(),
-		BoardroomLayout.physics_obstacles().size(),
-		"layout creates all StaticBody2D colliders"
+		BoardroomLayout.physics_obstacles().size() + 1,
+		"layout creates obstacle and perimeter colliders"
 	)
 	_expect_equal(
 		boardroom.player.character_sprite.sprite_frames.get_frame_count(&"walk_down"),
 		3,
 		"character loads three-frame walk animation"
+	)
+	_expect_vector_near(
+		boardroom.player.character_sprite.sprite_frames.get_frame_texture(&"walk_down", 0).get_size(),
+		Vector2(176.0, 216.0),
+		0.001,
+		"character uses high-resolution business frames"
 	)
 
 	var navigation_polygon := boardroom.navigation_region.navigation_polygon
@@ -173,7 +191,7 @@ func _test_boardroom_scene() -> void:
 	)
 
 	var start := BoardroomLayout.PLAYER_SPAWN
-	var target := Vector2(1200.0, 500.0)
+	var target := Vector2(1280.0, 360.0)
 	var path := NavigationServer2D.map_get_path(navigation_map, start, target, true)
 	_expect_true(path.size() >= 3, "path routes around four table obstacles")
 	_expect_true(_path_length(path) > start.distance_to(target), "obstacle route is longer than direct line")
@@ -222,13 +240,21 @@ func _test_boardroom_scene() -> void:
 		"virtual joystick output resets on release"
 	)
 
-	boardroom.player.global_position = Vector2(450.0, BoardroomLayout.TABLE_CENTERS[0])
+	var first_table := BoardroomLayout.table_obstacle_rects()[0]
+	var collision_start := Vector2(first_table.position.x - 70.0, first_table.get_center().y)
+	boardroom.player.global_position = collision_start
 	Input.action_press("move_right", 1.0)
 	for _frame in range(36):
 		await physics_frame
 	Input.action_release("move_right")
-	_expect_true(boardroom.player.global_position.x <= 479.0, "CharacterBody2D stops at table collider")
-	_expect_true(boardroom.player.global_position.x > 450.0, "CharacterBody2D moved before collision")
+	_expect_true(
+		boardroom.player.global_position.x <= first_table.position.x - 20.0,
+		"CharacterBody2D stops at table collider"
+	)
+	_expect_true(
+		boardroom.player.global_position.x > collision_start.x,
+		"CharacterBody2D moved before collision"
+	)
 
 	boardroom.boardroom_camera.set_mode(BoardroomCamera.FREE)
 	var camera_start := boardroom.boardroom_camera.global_position

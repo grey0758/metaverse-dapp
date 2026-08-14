@@ -118,15 +118,39 @@ func _interact() -> void:
 func _build_static_colliders() -> void:
 	for index in BoardroomLayout.physics_obstacles().size():
 		var rect: Rect2 = BoardroomLayout.physics_obstacles()[index]
-		var body := StaticBody2D.new()
-		body.name = "Obstacle%02d" % index
-		body.position = rect.get_center()
-		body.collision_layer = 1
-		body.collision_mask = 0
+		_add_rect_collider(rect, "Obstacle%02d" % index)
+	_add_walkable_boundary()
 
-		var shape := RectangleShape2D.new()
-		shape.size = rect.size
-		var collision := CollisionShape2D.new()
-		collision.shape = shape
-		body.add_child(collision)
-		obstacles.add_child(body)
+
+func _add_rect_collider(rect: Rect2, body_name: String) -> void:
+	var body := StaticBody2D.new()
+	body.name = body_name
+	body.position = rect.get_center()
+	body.collision_layer = 1
+	body.collision_mask = 0
+
+	var shape := RectangleShape2D.new()
+	shape.size = rect.size
+	var collision := CollisionShape2D.new()
+	collision.shape = shape
+	body.add_child(collision)
+	obstacles.add_child(body)
+
+
+func _add_walkable_boundary() -> void:
+	var outline := BoardroomLayout.walkable_outline()
+	var segments := PackedVector2Array()
+	for index in outline.size():
+		segments.append(outline[index])
+		segments.append(outline[(index + 1) % outline.size()])
+
+	var body := StaticBody2D.new()
+	body.name = "WalkableBoundary"
+	body.collision_layer = 1
+	body.collision_mask = 0
+	var shape := ConcavePolygonShape2D.new()
+	shape.segments = segments
+	var collision := CollisionShape2D.new()
+	collision.shape = shape
+	body.add_child(collision)
+	obstacles.add_child(body)

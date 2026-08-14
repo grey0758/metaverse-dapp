@@ -13,7 +13,7 @@ func bake_layout() -> void:
 
 	var source_geometry := NavigationMeshSourceGeometryData2D.new()
 	source_geometry.add_traversable_outline(
-		BoardroomLayout.rect_outline(BoardroomLayout.WALKABLE_RECT)
+		BoardroomLayout.walkable_outline()
 	)
 	for obstacle in BoardroomLayout.navigation_obstacles():
 		source_geometry.add_projected_obstruction(

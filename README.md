@@ -10,8 +10,9 @@ The product is game-first:
   `4.7.1-stable` engine;
 - Godot supplies `CharacterBody2D` collision movement, `NavigationAgent2D`
   pathfinding, `Camera2D`, touch input, animation, and responsive UI;
-- the first landscape slice contains the Plato boardroom, four obstacle-aware
-  table rows, a CC0 four-direction player, tap navigation, a multitouch virtual
+- the first landscape slice contains the high-fidelity Plato boardroom, four
+  obstacle-aware table rows, a semi-realistic four-direction business player,
+  tap navigation, a multitouch virtual
   joystick, LOCK/FREE camera modes, and contextual interaction;
 - the authoritative server must own multiplayer movement and match decisions;
   the current Godot boardroom is a local interaction slice, not proof of a

@@ -27,5 +27,7 @@
 - Imported subset: twelve 16 x 16 four-direction walking frames from the
   formal dark-haired character near the end of the official tile sheet.
 
-The Plato boardroom carpet, oak, and display textures are project-owned
-derivatives already documented in the repository's `docs/boardroom-assets.md`.
+The Plato boardroom map, carpet, oak, display, and Featherfall business
+character are project-owned derivatives documented in
+`docs/boardroom-assets.md` and `docs/character-assets.md`; they are not
+third-party package contents.

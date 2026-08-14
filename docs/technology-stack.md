@@ -17,7 +17,7 @@ integration outside the live match.
 | Tap navigation | `NavigationRegion2D`, `NavigationPolygon`, `NavigationAgent2D` | Active |
 | Touch movement | Pinned MIT Virtual Joystick Godot runtime subset | Active |
 | Camera | `Camera2D`, LOCK follow with forward framing, FREE drag pan | Active |
-| Character presentation | `AnimatedSprite2D`, selected CC0 Kenney frames | Active |
+| Character presentation | `AnimatedSprite2D`, project-owned 176 x 216 semi-realistic business frames | Active |
 | Match authority | Future Godot headless server sharing 2D map and rule data | Next networking slice |
 | Existing TypeScript server | Room/rule/protocol reference; unchanged in this migration | Retain |
 | Account and control API | Node.js 22, TypeScript, Fastify, Zod, guest-first sessions | Keep |
@@ -85,8 +85,8 @@ Rules enforced by the implementation:
 2. Any non-zero manual vector cancels active tap navigation immediately.
 3. `NavigationAgent2D` chooses path points; only `CharacterBody2D` performs
    physical movement.
-4. Boardroom table definitions generate visuals, physical colliders, and
-   navigation obstructions from one layout source.
+4. Boardroom table definitions generate physical colliders and navigation
+   obstructions from one layout source calibrated to replaceable map art.
 5. Touch controls are anchored independently from the world camera.
 6. A visual interaction candidate is only presentation. A future multiplayer
    server must validate and accept the actual action.

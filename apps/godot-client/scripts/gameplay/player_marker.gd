@@ -5,10 +5,10 @@ extends Node2D
 func _ready() -> void:
 	var label := Label.new()
 	label.text = "LOCAL PLAYER"
-	label.position = Vector2(-70.0, -70.0)
-	label.size = Vector2(140.0, 24.0)
+	label.position = Vector2(-80.0, -190.0)
+	label.size = Vector2(160.0, 26.0)
 	label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	label.add_theme_font_size_override("font_size", 13)
+	label.add_theme_font_size_override("font_size", 16)
 	label.add_theme_color_override("font_color", Color("e9ffff"))
 	label.add_theme_color_override("font_outline_color", Color(0.02, 0.05, 0.06, 0.95))
 	label.add_theme_constant_override("outline_size", 5)
@@ -23,7 +23,7 @@ func _draw() -> void:
 	draw_set_transform(Vector2.ZERO)
 	draw_arc(Vector2(0.0, 20.0), 31.0, 0.0, TAU, 40, Color("4fd2dc"), 3.0, true)
 	draw_colored_polygon(PackedVector2Array([
-		Vector2(0.0, -46.0),
-		Vector2(-8.0, -33.0),
-		Vector2(8.0, -33.0),
+		Vector2(0.0, -157.0),
+		Vector2(-9.0, -143.0),
+		Vector2(9.0, -143.0),
 	]), Color("4fd2dc"))

@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cjse30gae6ags"
-path="res://.godot/imported/plato-display.png-8c21b12824a54614daf3428adc084fe0.ctex"
+uid="uid://vg7d130e07f2"
+path="res://.godot/imported/plato-boardroom-hifi.png-f0873311f49c2af41346113a6945c077.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://assets/boardroom/plato-display.png"
-dest_files=["res://.godot/imported/plato-display.png-8c21b12824a54614daf3428adc084fe0.ctex"]
+source_file="res://assets/boardroom/plato-boardroom-hifi.png"
+dest_files=["res://.godot/imported/plato-boardroom-hifi.png-f0873311f49c2af41346113a6945c077.ctex"]
 
 [params]
 

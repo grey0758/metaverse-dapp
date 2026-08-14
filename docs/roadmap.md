@@ -9,14 +9,14 @@ Completed:
 
 - Godot `4.7.1-stable` project pinned under `apps/godot-client`;
 - 1280 x 720 landscape configuration with responsive 960 x 540 layout;
-- Plato boardroom presentation with four table rows, chairs, meeting screen,
-  lectern, windows, slat wall, and retained authorized textures;
+- 2560 x 1440 semi-realistic Plato boardroom presentation with four table rows,
+  chairs, meeting screen, lectern, windows, slat wall, and authorized branding;
 - `CharacterBody2D` collision movement and generated `StaticBody2D` furniture;
 - `NavigationRegion2D` baking plus `NavigationAgent2D` tap-to-move;
 - pinned MIT multitouch joystick; manual input cancels automatic navigation;
 - LOCK follow and bounded FREE drag `Camera2D` modes;
-- CC0 four-direction animated player and contextual USE action;
-- 54 automated checks covering project settings, layout, movement selection,
+- semi-realistic four-direction animated business player and contextual USE action;
+- 55 automated checks covering project settings, layout, movement selection,
   navigation, collision, camera, scene resources, and injected multitouch;
 - nonblank X11 visual smoke at 1280 x 720 and 960 x 540.
 
@@ -51,11 +51,11 @@ identified commit. Do not expand the full game loop before this gate.
 
 ## Slice 2: map and asset production
 
-- replace procedural room drawing with reviewed production tile/background
-  layers while preserving layout collision contracts;
+- extend the reviewed production background pipeline to additional rooms while
+  preserving layout collision contracts;
 - create additional rooms and transitions from authorized references;
-- replace placeholder 16 x 16 character frames with a coherent production
-  character set and full locomotion/state animation;
+- extend the coherent business character set with full locomotion and gameplay
+  state animations;
 - establish texture, atlas, audio, memory, and load-time budgets;
 - add localization-ready UI and accessibility options.
 
