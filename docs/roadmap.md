@@ -15,10 +15,14 @@ Completed:
 - `NavigationRegion2D` baking plus `NavigationAgent2D` tap-to-move;
 - pinned MIT multitouch joystick; manual input cancels automatic navigation;
 - LOCK follow and bounded FREE drag `Camera2D` modes;
-- semi-realistic four-direction animated business player and contextual USE action;
-- 55 automated checks covering project settings, layout, movement selection,
-  navigation, collision, camera, scene resources, and injected multitouch;
-- nonblank X11 visual smoke at 1280 x 720 and 960 x 540.
+- semi-realistic four-direction business player with walking/seated poses and
+  contextual SIT, STAND, and USE actions;
+- 80 reservable chair anchors plus foreground ordering for flags, lectern,
+  tables, and chairs;
+- 107 automated checks covering project settings, layout, seat occupancy,
+  movement locking, navigation, collision, camera, scene resources, HUD,
+  foreground ordering, and injected multitouch;
+- nonblank seated X11 visual smoke at 1280 x 720 and 960 x 540.
 
 This slice is local. It does not claim Android/iOS device behavior or
 multiplayer authority.

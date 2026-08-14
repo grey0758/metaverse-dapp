@@ -60,15 +60,36 @@ func set_movement_state(state: StringName) -> void:
 		&"path":
 			_movement_label.text = "ROUTE"
 			_movement_label.add_theme_color_override("font_color", GOLD)
+		&"seating", &"standing":
+			_movement_label.text = "SEATING" if state == &"seating" else "STANDING"
+			_movement_label.add_theme_color_override("font_color", GOLD)
+		&"seated":
+			_movement_label.text = "SEATED"
+			_movement_label.add_theme_color_override("font_color", Color("45d49b"))
 		_:
 			_movement_label.text = "READY"
 			_movement_label.add_theme_color_override("font_color", TEXT)
 
 
-func set_interaction(context: String, available: bool) -> void:
+func set_interaction(context: String, available: bool, action_text: String = "USE") -> void:
 	_interaction_label.text = context if available else "NO ACTION"
+	if not available and context != "":
+		_interaction_label.text = context
+	_action_button.text = action_text
 	_action_button.disabled = not available
 	_action_button.modulate = Color.WHITE if available else Color(0.6, 0.64, 0.65, 0.72)
+
+
+func action_text() -> String:
+	return _action_button.text
+
+
+func interaction_available() -> bool:
+	return not _action_button.disabled
+
+
+func movement_text() -> String:
+	return _movement_label.text
 
 
 func show_toast(message: String) -> void:

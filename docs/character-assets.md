@@ -2,20 +2,23 @@
 
 ## Godot 2D primary character
 
-The primary Godot client uses twelve project-owned 176 x 216 RGBA walking
-frames generated for Featherfall. They depict one consistent adult business
-professional in a charcoal suit, with three phases each for down, left, up,
-and right.
+The primary Godot client uses sixteen project-owned 176 x 216 RGBA frames
+generated for Featherfall. They depict one consistent adult business
+professional in a charcoal suit, with three walking phases and one seated pose
+for down, left, up, and right.
 
 - Runtime directory:
   `apps/godot-client/assets/characters/featherfall-business/`
 - Source model: `gpt-image-2`
-- Source sheet SHA-256:
+- Walking source sheet SHA-256:
   `2f96450d39ff528f5b2be27a8b8fc4501e63e2867bb22e3758c4632f1adbcc78`
+- Seated source sheet SHA-256:
+  `6aca2129599bd8333b2051559abcb45a07b43ce9c3f6522ae834a8a27e57f1d6`
 - Runtime hashes and transformations: `PROVENANCE.md` in the same directory
 
-`PlayerController` selects direction from movement velocity and holds the
-middle frame while idle. Character art is presentation only; the
+`PlayerController` selects direction from movement velocity, holds the middle
+walking frame while idle, and selects the chair's matching seated pose during
+SIT. Character art is presentation only; the
 `CharacterBody2D` collision shape and movement controller remain stable when
 the art is replaced. Linear filtering and per-frame mipmaps preserve smooth
 edges at the locked camera's fractional zoom.
@@ -26,9 +29,9 @@ fallback. Its archive SHA-256 is
 `4541d89d639fc7d1e905dd925e55b1c4977a41d983516228db1d57173bb9afaf`,
 and its bundled notice marks it Creative Commons Zero (CC0 1.0).
 
-Future character work should retain the four-direction, three-phase animation
-contract or update it deliberately with tests, and must record source rights
-suitable for the repository and mobile binaries.
+Future character work should retain the four-direction walking and seated
+animation contract or update it deliberately with tests, and must record
+source rights suitable for the repository and mobile binaries.
 
 ## Retained Unity 3D character
 

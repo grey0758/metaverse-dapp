@@ -23,7 +23,7 @@ builds; desktop keyboard controls exist for debugging and automation.
 | Tap room floor | Engine navigation path to the closest walkable point |
 | LOCK | Follow player with forward meeting-room framing |
 | FREE | Unlock camera; drag the room to pan within bounds |
-| USE | Run the currently available context action |
+| SIT / STAND / USE | Run the currently available context action |
 | WASD/arrows | Desktop-only movement debug input |
 | `E`/Space | Desktop-only interaction debug input |
 | `L` / `F` | Desktop-only LOCK / FREE debug input |
@@ -37,9 +37,9 @@ GODOT_BIN=/path/to/Godot_v4.7.1-stable pnpm godot:check
 ```
 
 This command verifies the editor version, imports resources in headless editor
-mode, and runs the repository-owned test runner. The current suite covers 55
-settings, layout, input, animation, navigation, collision, camera, scene, and
-multitouch checks.
+mode, and runs the repository-owned test runner. The current suite covers 107
+settings, layout, seat identity/occupancy, input locking, animation, navigation,
+collision, camera, scene, foreground, HUD, and multitouch checks.
 
 Run visual smoke under a real display or Xvfb after presentation changes:
 
@@ -55,6 +55,26 @@ xvfb-run -a -s '-screen 0 1440x900x24' \
 Repeat at 960 x 540 and inspect both images. Headless tests and desktop mouse
 touch emulation do not validate Android/iOS safe areas, multitouch hardware,
 rotation, lifecycle, performance, thermal load, or battery use.
+
+Pass `--seat=seat_t01_north_06` after the script separator to exercise the
+actual SIT flow before capture.
+
+### Seating interaction
+
+The chair workflow follows the established Godot community pattern: proximity
+selects a chair, a per-chair anchor fixes the final pose, and a Tween aligns the
+character before the seated animation is held. The layout stores anchor vectors
+instead of adding 80 `Marker2D` scene nodes, but the ownership boundary is the
+same. Relevant community discussions are:
+
+- [How can I make my character sit on a chair?](https://forum.godotengine.org/t/how-can-i-make-my-character-sit-on-a-chair/39651)
+- [Jittering CharacterBody3D when setting global position](https://forum.godotengine.org/t/jittering-characterbody3d-when-setting-global-position/137892)
+
+SIT cancels navigation, zeroes velocity, rejects manual/tap movement, disables
+the player collision shape, reserves the seat, and Tweens to its exact anchor.
+STAND returns to the walkable approach point before restoring collision and
+movement. The explicit local state is deliberately smaller than a generic FSM
+plugin and leaves seat occupancy available to future server authority.
 
 ### Extending maps and assets
 

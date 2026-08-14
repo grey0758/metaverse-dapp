@@ -68,6 +68,28 @@ func _test_project_settings() -> void:
 func _test_layout_contract() -> void:
 	_expect_equal(BoardroomLayout.table_surface_rects().size(), 4, "four Plato table rows")
 	_expect_equal(BoardroomLayout.CHAIR_COUNT_PER_SIDE, 10, "generated room has ten chairs per table side")
+	var seats := BoardroomLayout.seats()
+	var seat_ids := {}
+	var north_count := 0
+	var south_count := 0
+	var all_approaches_walkable := true
+	for seat in seats:
+		seat_ids[seat.id] = true
+		all_approaches_walkable = all_approaches_walkable and BoardroomLayout.point_is_walkable(seat.approach)
+		if seat.side == &"north":
+			north_count += 1
+		elif seat.side == &"south":
+			south_count += 1
+	_expect_equal(seats.size(), 80, "four tables expose eighty seat anchors")
+	_expect_equal(seat_ids.size(), 80, "every chair has a unique authoritative seat id")
+	_expect_equal(north_count, 40, "forty chairs face south from the north table sides")
+	_expect_equal(south_count, 40, "forty chairs face north from the south table sides")
+	_expect_true(all_approaches_walkable, "every chair approach point is walkable")
+	_expect_equal(
+		BoardroomLayout.seat_by_id(seats[17].id).anchor,
+		seats[17].anchor,
+		"seat ids resolve to their exact sitting anchors"
+	)
 	_expect_true(
 		BoardroomLayout.point_is_walkable(BoardroomLayout.PLAYER_SPAWN),
 		"player spawn is walkable"
@@ -161,6 +183,12 @@ func _test_boardroom_scene() -> void:
 	_expect_true(is_instance_valid(boardroom.player), "scene has CharacterBody2D player")
 	_expect_true(is_instance_valid(boardroom.player.navigation_agent), "player has NavigationAgent2D")
 	_expect_true(is_instance_valid(boardroom.hud.virtual_joystick), "scene has community virtual joystick")
+	_expect_equal(boardroom.seat_count(), 80, "scene registers all layout seats")
+	_expect_equal(boardroom.foreground.occluder_count(), 98, "foreground redraws flags, lectern, tables, and chairs")
+	_expect_true(
+		boardroom.foreground.z_index > boardroom.player.z_index,
+		"fixed facilities render above the character"
+	)
 	_expect_equal(
 		boardroom.obstacles.get_child_count(),
 		BoardroomLayout.physics_obstacles().size() + 1,
@@ -177,6 +205,18 @@ func _test_boardroom_scene() -> void:
 		0.001,
 		"character uses high-resolution business frames"
 	)
+	for seated_animation in [&"sit_down", &"sit_left", &"sit_up", &"sit_right"]:
+		_expect_equal(
+			boardroom.player.character_sprite.sprite_frames.get_frame_count(seated_animation),
+			1,
+			"%s has one stable seated pose" % seated_animation
+		)
+		_expect_vector_near(
+			boardroom.player.character_sprite.sprite_frames.get_frame_texture(seated_animation, 0).get_size(),
+			Vector2(176.0, 216.0),
+			0.001,
+			"%s uses the aligned business-character canvas" % seated_animation
+		)
 
 	var navigation_polygon := boardroom.navigation_region.navigation_polygon
 	_expect_true(navigation_polygon != null, "navigation polygon is generated")
@@ -189,6 +229,23 @@ func _test_boardroom_scene() -> void:
 		NavigationServer2D.map_get_iteration_id(navigation_map) > 0,
 		"navigation map synchronized"
 	)
+	var all_seat_approaches_on_navigation := true
+	var all_seat_approaches_reachable := true
+	for seat in BoardroomLayout.seats():
+		var closest_approach := NavigationServer2D.map_get_closest_point(navigation_map, seat.approach)
+		all_seat_approaches_on_navigation = (
+			all_seat_approaches_on_navigation
+			and closest_approach.distance_to(seat.approach) <= 5.0
+		)
+		var seat_path := NavigationServer2D.map_get_path(
+			navigation_map,
+			BoardroomLayout.PLAYER_SPAWN,
+			closest_approach,
+			true
+		)
+		all_seat_approaches_reachable = all_seat_approaches_reachable and not seat_path.is_empty()
+	_expect_true(all_seat_approaches_on_navigation, "all chair approach points lie on the baked navigation map")
+	_expect_true(all_seat_approaches_reachable, "all chair approach points are reachable from spawn")
 
 	var start := BoardroomLayout.PLAYER_SPAWN
 	var target := Vector2(1280.0, 360.0)
@@ -265,6 +322,128 @@ func _test_boardroom_scene() -> void:
 	)
 	boardroom.boardroom_camera.set_mode(BoardroomCamera.LOCKED)
 	_expect_equal(boardroom.boardroom_camera.mode, BoardroomCamera.LOCKED, "LOCK camera mode restores follow")
+
+	var seats := BoardroomLayout.seats()
+	var remotely_occupied := seats[3]
+	_expect_false(
+		boardroom.reserve_seat(&"missing_seat", &"remote_player"),
+		"unknown seat ids cannot be reserved"
+	)
+	_expect_true(
+		boardroom.reserve_seat(remotely_occupied.id, &"remote_player"),
+		"an available seat accepts an authoritative occupant"
+	)
+	_expect_false(
+		boardroom.reserve_seat(remotely_occupied.id, Boardroom.LOCAL_OCCUPANT_ID),
+		"an occupied seat cannot be claimed twice"
+	)
+	_expect_equal(
+		boardroom.seat_occupant(remotely_occupied.id),
+		&"remote_player",
+		"seat occupancy retains the authoritative occupant id"
+	)
+	_expect_false(
+		boardroom.release_seat(remotely_occupied.id, Boardroom.LOCAL_OCCUPANT_ID),
+		"a different occupant cannot release a reserved chair"
+	)
+	_expect_true(
+		boardroom.release_seat(remotely_occupied.id, &"remote_player"),
+		"the authoritative occupant can release a chair"
+	)
+
+	var selected_seat := seats[10]
+	boardroom.player.global_position = selected_seat.approach
+	boardroom._update_interaction()
+	_expect_equal(boardroom.hud.action_text(), "SIT", "near an available chair the action becomes SIT")
+	_expect_true(boardroom.hud.interaction_available(), "nearby available chair enables the action button")
+	boardroom._interact()
+	await process_frame
+	_expect_true(boardroom.player.is_seat_transitioning(), "SIT begins a controlled alignment transition")
+	_expect_equal(
+		boardroom.seat_occupant(selected_seat.id),
+		Boardroom.LOCAL_OCCUPANT_ID,
+		"SIT reserves the chair before moving into it"
+	)
+	for _frame in range(20):
+		await physics_frame
+	await process_frame
+	_expect_true(boardroom.player.is_seated(), "player reaches the seated state")
+	_expect_false(boardroom.player.is_seat_transitioning(), "seat alignment completes")
+	_expect_equal(boardroom.player.current_seat_id(), selected_seat.id, "player retains the occupied seat id")
+	_expect_vector_near(
+		boardroom.player.global_position,
+		selected_seat.anchor,
+		0.5,
+		"player aligns to the exact chair anchor"
+	)
+	_expect_true(boardroom.player.collision_shape.disabled, "seated character collision is disabled")
+	_expect_equal(boardroom.player.movement_state(), &"seated", "player movement state is seated")
+	_expect_equal(boardroom.hud.movement_text(), "SEATED", "HUD clearly reports SEATED")
+	_expect_equal(boardroom.hud.action_text(), "STAND", "occupied chair action becomes STAND")
+	_expect_equal(
+		boardroom.player.character_sprite.animation,
+		selected_seat.animation,
+		"chair direction selects the matching seated pose"
+	)
+
+	var seated_position := boardroom.player.global_position
+	boardroom.player.set_move_target(Vector2(1280.0, 360.0))
+	Input.action_press("move_right", 1.0)
+	for _frame in range(8):
+		await physics_frame
+	Input.action_release("move_right")
+	_expect_false(boardroom.player.has_active_navigation(), "seated tap navigation is rejected")
+	_expect_vector_near(
+		boardroom.player.global_position,
+		seated_position,
+		0.01,
+		"seated manual input cannot move the character"
+	)
+	_parse_touch(9, joystick_center, true)
+	_parse_drag(9, joystick_center + Vector2(64.0, 0.0), Vector2(64.0, 0.0))
+	await process_frame
+	_expect_true(
+		boardroom.hud.virtual_joystick.output.x > 0.7,
+		"virtual joystick still owns its pointer while seated"
+	)
+	for _frame in range(4):
+		await physics_frame
+	_expect_vector_near(
+		boardroom.player.global_position,
+		seated_position,
+		0.01,
+		"seated virtual joystick input cannot move the character"
+	)
+	_parse_touch(9, joystick_center + Vector2(64.0, 0.0), false)
+	_parse_touch(10, Vector2(640.0, 360.0), true)
+	_parse_touch(10, Vector2(640.0, 360.0), false)
+	await process_frame
+	await physics_frame
+	_expect_false(boardroom.player.has_active_navigation(), "seated room touches cannot start navigation")
+	_expect_false(
+		boardroom.reserve_seat(selected_seat.id, &"remote_player"),
+		"another player cannot claim the local occupied chair"
+	)
+
+	boardroom._interact()
+	await process_frame
+	_expect_true(boardroom.player.is_seat_transitioning(), "STAND begins a controlled exit transition")
+	_expect_equal(boardroom.hud.action_text(), "STAND", "standing transition keeps the STAND action context")
+	for _frame in range(20):
+		await physics_frame
+	await process_frame
+	await physics_frame
+	_expect_false(boardroom.player.is_seated(), "player leaves the seated state")
+	_expect_false(boardroom.player.is_movement_locked(), "standing restores movement input")
+	_expect_false(boardroom.player.collision_shape.disabled, "standing restores character collision")
+	_expect_vector_near(
+		boardroom.player.global_position,
+		selected_seat.approach,
+		0.5,
+		"standing returns to the safe chair approach point"
+	)
+	_expect_equal(boardroom.seat_occupant(selected_seat.id), &"", "standing releases chair occupancy")
+	_expect_equal(boardroom.hud.action_text(), "SIT", "released nearby chair returns to SIT")
 
 	boardroom.queue_free()
 	await process_frame

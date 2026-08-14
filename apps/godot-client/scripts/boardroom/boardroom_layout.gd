@@ -5,6 +5,8 @@ const ROOM_RECT := Rect2(0.0, 0.0, 2560.0, 1440.0)
 const PLAYER_SPAWN := Vector2(1280.0, 850.0)
 const TABLE_CENTERS := [539.0, 737.0, 947.0, 1176.0]
 const CHAIR_COUNT_PER_SIDE := 10
+const SEAT_INTERACTION_RADIUS := 78.0
+const SEAT_EDGE_MARGIN := 80.0
 
 
 static func walkable_outline() -> PackedVector2Array:
@@ -65,6 +67,86 @@ static func interaction_points() -> Array[Dictionary]:
 			"radius": 115.0,
 		},
 	]
+
+
+static func seats() -> Array[Dictionary]:
+	var result: Array[Dictionary] = []
+	var surfaces := table_surface_rects()
+	var obstacles := table_obstacle_rects()
+	for table_index in surfaces.size():
+		var surface := surfaces[table_index]
+		var obstacle := obstacles[table_index]
+		var north_approach_y := obstacle.position.y - 68.0
+		if table_index > 0:
+			north_approach_y = obstacles[table_index - 1].end.y + 25.0
+		var south_approach_y := obstacle.end.y + 68.0
+		if table_index < obstacles.size() - 1:
+			south_approach_y = obstacles[table_index + 1].position.y - 25.0
+		else:
+			south_approach_y = 1344.0
+
+		for seat_index in CHAIR_COUNT_PER_SIDE:
+			var ratio := float(seat_index) / float(CHAIR_COUNT_PER_SIDE - 1)
+			var seat_x := lerpf(
+				surface.position.x + SEAT_EDGE_MARGIN,
+				surface.end.x - SEAT_EDGE_MARGIN,
+				ratio
+			)
+			var north_approach_x := seat_x
+			if table_index == 0 and seat_index == 0:
+				north_approach_x = 824.0
+			result.append(_seat(
+				table_index,
+				seat_index,
+				&"north",
+				Vector2(seat_x, obstacle.position.y + 28.0),
+				Vector2(north_approach_x, north_approach_y),
+				&"sit_down",
+				&"walk_down",
+				result.size()
+			))
+			result.append(_seat(
+				table_index,
+				seat_index,
+				&"south",
+				Vector2(seat_x, obstacle.end.y + 54.0),
+				Vector2(seat_x, south_approach_y),
+				&"sit_up",
+				&"walk_up",
+				result.size()
+			))
+	return result
+
+
+static func seat_by_id(seat_id: StringName) -> Dictionary:
+	for seat in seats():
+		if seat.id == seat_id:
+			return seat
+	return {}
+
+
+static func _seat(
+	table_index: int,
+	seat_index: int,
+	side: StringName,
+	anchor: Vector2,
+	approach: Vector2,
+	animation: StringName,
+	walk_animation: StringName,
+	global_index: int
+) -> Dictionary:
+	return {
+		"id": StringName("seat_t%02d_%s_%02d" % [table_index + 1, side, seat_index + 1]),
+		"label": "CHAIR %02d" % (global_index + 1),
+		"table_index": table_index,
+		"seat_index": seat_index,
+		"side": side,
+		"anchor": anchor,
+		"approach": approach,
+		"animation": animation,
+		"walk_animation": walk_animation,
+		"radius": SEAT_INTERACTION_RADIUS,
+	}
 
 
 static func rect_outline(rect: Rect2) -> PackedVector2Array:

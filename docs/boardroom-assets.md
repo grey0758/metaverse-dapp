@@ -38,10 +38,23 @@ interaction points. `BoardroomNavigation` bakes from that data, while physics
 uses the same obstacles plus a closed perimeter collider.
 
 The active character set is under
-`assets/characters/featherfall-business/`. It contains twelve 176 x 216 RGBA
-frames: three walking phases for down, left, up, and right. Its source and
-per-frame hashes are recorded in that directory's `PROVENANCE.md`. The former
-CC0 Kenney frames remain available as an unreferenced low-resolution fallback.
+`assets/characters/featherfall-business/`. It contains sixteen 176 x 216 RGBA
+frames: three walking phases plus one seated pose for down, left, up, and
+right. Its source and per-frame hashes are recorded in that directory's
+`PROVENANCE.md`. The former CC0 Kenney frames remain available as an
+unreferenced low-resolution fallback.
+
+`BoardroomForeground` redraws 98 tightly scoped regions from the accepted room
+texture above the player: five flags, the lectern, four table surfaces and
+legs, and all 80 chairs. The currently occupied chair is temporarily omitted
+from that upper layer so the seated person remains in front of its backrest;
+the table continues to cover the lower body. The reuse is pixel-identical and
+does not add another room bitmap or affect collision/navigation data.
+
+`BoardroomLayout` exposes 80 stable seat IDs. Each chair has a seated anchor,
+a walkable approach point, direction-specific animation, interaction radius,
+and runtime occupant. The local prototype reserves a chair before alignment;
+the same occupant boundary is available for the future authoritative server.
 
 Godot imports the high-resolution room, display, and business character with
 mipmaps; the project canvas filter is linear with mipmaps. This removes the
@@ -70,15 +83,25 @@ nearest-neighbor pixel treatment used by the initial prototype.
 - Character transformation: soft chroma-key matte and despill, deterministic
   cell split, independent-shadow removal from the three back-facing frames,
   common 176 x 216 canvas, aligned foot baseline, and stripped metadata.
+- Seated character source model: `gpt-image-2`.
+- Seated source: 1254 x 1254 PNG, SHA-256
+  `6aca2129599bd8333b2051559abcb45a07b43ce9c3f6522ae834a8a27e57f1d6`.
+- Seated prompt intent: preserve the accepted business professional and render
+  one clean seated pose in four directions without a chair, text, logo, prop,
+  extra person, floor, watermark, or shadow.
+- Seated transformation: `#f205f3` soft key and despill, deterministic split,
+  four 176 x 216 RGBA canvases, root alignment, metadata stripping, and mipmap
+  import.
 
 The user directed and authorized the generated room and character derivatives
 for this project. Provider credentials, raw Plato photographs, generation
 responses, rejected candidates, and source sheets remain outside Git in the
 ignored operations scratch area.
 
-The 2D client has been visually smoked at 1280 x 720 and 960 x 540 on Linux
-X11 software rendering. That proves nonblank composition and responsive HUD
-placement, not physical mobile-device performance.
+The 2D client, including an occupied first-row chair, has been visually smoked
+at 1280 x 720 and 960 x 540 on Linux X11 software rendering. That proves
+nonblank composition, foreground ordering, and responsive HUD placement, not
+physical mobile-device performance.
 
 ### Retained Unity prototype
 

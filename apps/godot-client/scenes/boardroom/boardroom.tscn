@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=14 format=3]
 
 [ext_resource type="Script" path="res://scripts/boardroom/boardroom.gd" id="1_boardroom"]
 [ext_resource type="Script" path="res://scripts/boardroom/boardroom_art.gd" id="2_art"]
@@ -8,6 +8,7 @@
 [ext_resource type="Script" path="res://scripts/gameplay/player_marker.gd" id="6_marker"]
 [ext_resource type="Script" path="res://scripts/gameplay/boardroom_camera.gd" id="7_camera"]
 [ext_resource type="Script" path="res://scripts/ui/game_hud.gd" id="8_hud"]
+[ext_resource type="Script" path="res://scripts/boardroom/boardroom_foreground.gd" id="9_foreground"]
 
 [sub_resource type="CircleShape2D" id="CircleShape_player"]
 radius = 22.0
@@ -70,6 +71,10 @@ monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/InteractionArea"]
 shape = SubResource("CircleShape_interaction")
+
+[node name="BoardroomForeground" type="Node2D" parent="."]
+z_index = 12
+script = ExtResource("9_foreground")
 
 [node name="BoardroomCamera" type="Camera2D" parent="."]
 position = Vector2(1280, 514)
