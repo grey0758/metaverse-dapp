@@ -5,8 +5,12 @@ const ROOM_TEXTURE := preload("res://assets/boardroom/plato-boardroom-hifi.png")
 const ROOM_SIZE := Vector2(2560.0, 1440.0)
 
 var _fixed_occluders: Array[PackedVector2Array] = []
+var _table_occluders: Dictionary = {}
+var _table_edge_occluders: Dictionary = {}
 var _seat_occluders: Dictionary = {}
 var _active_seat_id: StringName = &""
+var _active_table_index := -1
+var _active_seat_side: StringName = &""
 
 
 func _ready() -> void:
@@ -15,19 +19,27 @@ func _ready() -> void:
 
 
 func occluder_count() -> int:
-	return _fixed_occluders.size() + _seat_occluders.size()
+	return _fixed_occluders.size() + _table_occluders.size() + _seat_occluders.size()
 
 
 func set_active_seat(seat_id: StringName) -> void:
 	if seat_id == _active_seat_id:
 		return
 	_active_seat_id = seat_id
+	var seat := BoardroomLayout.seat_by_id(seat_id)
+	_active_table_index = seat.get("table_index", -1)
+	_active_seat_side = seat.get("side", &"")
 	queue_redraw()
 
 
 func _draw() -> void:
 	for polygon in _fixed_occluders:
 		_draw_texture_polygon(polygon)
+	for table_index in _table_occluders:
+		if table_index == _active_table_index and _active_seat_side == &"south":
+			_draw_texture_polygon(_table_edge_occluders[table_index])
+		else:
+			_draw_texture_polygon(_table_occluders[table_index])
 	for seat_id in _seat_occluders:
 		if seat_id != _active_seat_id:
 			_draw_texture_polygon(_seat_occluders[seat_id])
@@ -67,10 +79,14 @@ func _build_occluders() -> void:
 	for table_index in surfaces.size():
 		var surface := surfaces[table_index]
 		var obstacle := obstacles[table_index]
-		_fixed_occluders.append(_rect_polygon(Rect2(
+		_table_occluders[table_index] = _rect_polygon(Rect2(
 			surface.position - Vector2(4.0, 6.0),
 			surface.size + Vector2(8.0, 30.0)
-		)))
+		))
+		_table_edge_occluders[table_index] = _rect_polygon(Rect2(
+			Vector2(surface.position.x - 4.0, surface.end.y - 10.0),
+			Vector2(surface.size.x + 8.0, 24.0)
+		))
 		_fixed_occluders.append(_rect_polygon(Rect2(
 			Vector2(obstacle.position.x, surface.end.y - 2.0),
 			Vector2(24.0, obstacle.end.y - surface.end.y + 46.0)

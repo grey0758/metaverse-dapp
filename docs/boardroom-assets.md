@@ -47,9 +47,11 @@ unreferenced low-resolution fallback.
 `BoardroomForeground` redraws 98 tightly scoped regions from the accepted room
 texture above the player: five flags, the lectern, four table surfaces and
 legs, and all 80 chairs. The currently occupied chair is temporarily omitted
-from that upper layer so the seated person remains in front of its backrest;
-the table continues to cover the lower body. The reuse is pixel-identical and
-does not add another room bitmap or affect collision/navigation data.
+from that upper layer so the seated person remains in front of its backrest.
+A north-side seat keeps the full table surface over the lower body; a south-side
+seat keeps only the near table edge over the character so the torso is not
+hidden by the entire tabletop. The reuse is pixel-identical and does not add
+another room bitmap or affect collision/navigation data.
 
 `BoardroomLayout` exposes 80 stable seat IDs. Each chair has a seated anchor,
 a walkable approach point, direction-specific animation, interaction radius,
