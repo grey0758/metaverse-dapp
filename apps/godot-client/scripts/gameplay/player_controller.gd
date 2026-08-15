@@ -7,7 +7,7 @@ signal navigation_completed
 signal movement_state_changed(state: StringName)
 signal seat_state_changed(seat_id: StringName, seated: bool)
 
-const FRAME_ROOT := "res://assets/characters/featherfall-business/"
+const FRAME_ROOT := "res://assets/characters/chen-weilun/"
 const FRAME_PATHS := {
 	&"walk_left": ["walk-left-0.png", "walk-left-1.png", "walk-left-2.png"],
 	&"walk_down": ["walk-down-0.png", "walk-down-1.png", "walk-down-2.png"],

@@ -195,6 +195,11 @@ func _test_boardroom_scene() -> void:
 		"layout creates obstacle and perimeter colliders"
 	)
 	_expect_equal(
+		PlayerController.FRAME_ROOT,
+		"res://assets/characters/chen-weilun/",
+		"player uses the authorized Chen Weilun protagonist"
+	)
+	_expect_equal(
 		boardroom.player.character_sprite.sprite_frames.get_frame_count(&"walk_down"),
 		3,
 		"character loads three-frame walk animation"

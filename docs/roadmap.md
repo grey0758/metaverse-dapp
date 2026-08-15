@@ -19,7 +19,7 @@ Completed:
   contextual SIT, STAND, and USE actions;
 - 80 reservable chair anchors plus foreground ordering for flags, lectern,
   tables, and chairs;
-- 107 automated checks covering project settings, layout, seat occupancy,
+- 108 automated checks covering project settings, layout, seat occupancy,
   movement locking, navigation, collision, camera, scene resources, HUD,
   foreground ordering, and injected multitouch;
 - nonblank seated X11 visual smoke at 1280 x 720 and 960 x 540.

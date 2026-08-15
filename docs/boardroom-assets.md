@@ -38,11 +38,12 @@ interaction points. `BoardroomNavigation` bakes from that data, while physics
 uses the same obstacles plus a closed perimeter collider.
 
 The active character set is under
-`assets/characters/featherfall-business/`. It contains sixteen 176 x 216 RGBA
-frames: three walking phases plus one seated pose for down, left, up, and
-right. Its source and per-frame hashes are recorded in that directory's
-`PROVENANCE.md`. The former CC0 Kenney frames remain available as an
-unreferenced low-resolution fallback.
+`assets/characters/chen-weilun/`. It contains sixteen 176 x 216 RGBA frames
+derived from user-authorized portraits: three walking phases plus one seated
+pose for down, left, up, and right. Its source rights, transformations, and
+per-frame hashes are recorded in that directory's `PROVENANCE.md`. The generic
+Featherfall business frames remain available as a high-resolution fallback,
+and the former CC0 Kenney frames remain as a low-resolution fallback.
 
 `BoardroomForeground` redraws 98 tightly scoped regions from the accepted room
 texture above the player: five flags, the lectern, four table surfaces and
@@ -61,6 +62,24 @@ the same occupant boundary is available for the future authoritative server.
 Godot imports the high-resolution room, display, and business character with
 mipmaps; the project canvas filter is linear with mipmaps. This removes the
 nearest-neighbor pixel treatment used by the initial prototype.
+
+### 2026-08-14 likeness-based protagonist
+
+- Identity source: two user-supplied portraits of Dr. Chen Weilun; raw photos
+  remain outside Git.
+- Authorization: the user explicitly requested and authorized making the
+  current protagonist from the supplied portraits.
+- Source model: `gpt-image-2` through the project-scoped provider reference.
+- Walking source: 1024 x 1536 PNG, SHA-256
+  `d4174c9d086b3769ce841bf0dc4d74de88becb61d24e32f092a185366a5976fd`.
+- Seated source: 1254 x 1254 PNG, SHA-256
+  `1e841d1c10ae9dcafcd715414d9d2cb9e6d76c878e54bdebe750c2a55edc3618`.
+- Transformation: soft chroma-key matte and despill, deterministic direction
+  split, common 176 x 216 RGBA canvases, established walking and seat-root
+  alignment, metadata stripping, and mipmap import.
+- Prompt intent: preserve the authorized face, side-parted hair, metal-frame
+  glasses, dark navy suit, white shirt, dotted navy tie, and lapel pin while
+  matching the existing semi-realistic four-direction mobile sprite contract.
 
 ### 2026-08-13 Godot generation
 

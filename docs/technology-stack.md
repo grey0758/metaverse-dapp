@@ -17,7 +17,7 @@ integration outside the live match.
 | Tap navigation | `NavigationRegion2D`, `NavigationPolygon`, `NavigationAgent2D` | Active |
 | Touch movement | Pinned MIT Virtual Joystick Godot runtime subset | Active |
 | Camera | `Camera2D`, LOCK follow with forward framing, FREE drag pan | Active |
-| Character presentation | `AnimatedSprite2D`, project-owned 176 x 216 semi-realistic business frames | Active |
+| Character presentation | `AnimatedSprite2D`, project-authorized 176 x 216 semi-realistic business frames | Active |
 | Match authority | Future Godot headless server sharing 2D map and rule data | Next networking slice |
 | Existing TypeScript server | Room/rule/protocol reference; unchanged in this migration | Retain |
 | Account and control API | Node.js 22, TypeScript, Fastify, Zod, guest-first sessions | Keep |

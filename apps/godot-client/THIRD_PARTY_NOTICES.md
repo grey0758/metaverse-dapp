@@ -27,7 +27,19 @@
 - Imported subset: twelve 16 x 16 four-direction walking frames from the
   formal dark-haired character near the end of the official tile sheet.
 
-The Plato boardroom map, carpet, oak, display, and Featherfall business
+The Plato boardroom map, carpet, oak, display, and generic Featherfall business
 character are project-owned derivatives documented in
 `docs/boardroom-assets.md` and `docs/character-assets.md`; they are not
 third-party package contents.
+
+## Chen Weilun Likeness-Based Protagonist
+
+- Source: user-supplied portraits; raw photographs are not committed.
+- Authorization: the user explicitly authorized project use as the current
+  protagonist.
+- Runtime subset: sixteen generated 176 x 216 RGBA walking and seated frames
+  under `assets/characters/chen-weilun/`.
+- Rights boundary: project use only; the person's likeness is not offered as a
+  reusable asset pack or granted standalone redistribution rights.
+- Full hashes and transformation details are recorded in the adjacent
+  `PROVENANCE.md` and `docs/character-assets.md`.

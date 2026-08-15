@@ -37,7 +37,7 @@ GODOT_BIN=/path/to/Godot_v4.7.1-stable pnpm godot:check
 ```
 
 This command verifies the editor version, imports resources in headless editor
-mode, and runs the repository-owned test runner. The current suite covers 107
+mode, and runs the repository-owned test runner. The current suite covers 108
 settings, layout, seat identity/occupancy, input locking, animation, navigation,
 collision, camera, scene, foreground, HUD, and multitouch checks.
 
